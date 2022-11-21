@@ -1,0 +1,80 @@
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+  datasource:
+    url: jdbc:mysql://192.168.10.123:3306/zero-to-guru
+    username: root
+    password: 123456
+
+# Naming strategy
+#  mail
+#  mail:
+#    host: smtp.gmail.com
+#    username: elliotsaii1@gmail.com
+#    password: inrfbjqwjrdzuakv
+#    properties:
+#      mail:
+#        smtp:
+#          ssl:
+#            enable: true
+#          auth: true
+#          starttls:
+#            enable: true
+#            required: true
+  mail:
+    host: smtp.gmail.com
+    username: elliotsaii1@gmail.com
+    password: inrfbjqwjrdzuakv
+    port: 465
+    protocol: smtps
+    smtp:
+      proxy:
+        host: 192.168.10.199
+        port: 7890
+    properties:
+      mail:
+        transport:
+          protocol: smtps
+        smtps:
+          starttls:
+            enable: true
+          timeout: 8000
+
+  # redis
+  redis:
+    database: 0
+    host: 127.0.0.1
+    lettuce:
+      pool:
+        max-active: 8   #??????????,? -1 ?????
+        max-idle: 8     #??????????,? 0 ?????
+        max-wait: -1ms  #??????????????????????????-1??????
+        min-idle: 0     #??????????,? 0 ?????
+      shutdown-timeout: 100ms
+    password: ''
+    port: 6379
+#File
+  servlet:
+    multipart:
+      max-request-size: 30MB
+      max-file-size: 30MB
+
+#vip config
+vip:
+  signatureSecret: dd05f1c54d63749eda95f9fa6d49v442a
+  uploadType: alioss
+  path:
+    #??????? ??
+    upload: /opt/upFiles
+    #webapp????
+    webapp: /opt/webapp
+  oss:
+   accessKey: LTAI5t9j4E2Pt9NFmKPXKGPs
+   secretKey: 5m7X52AgNoZaMCZXZ2oeviH9vnhcj6
+   endpoint: oss-cn-hongkong.aliyuncs.com
+   bucketName: liuxing-shangwu
+
+
