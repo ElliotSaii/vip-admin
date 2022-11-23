@@ -1,5 +1,6 @@
 package com.techguy.admin.controller;
 
+import com.techguy.admin.vo.SubProductVo;
 import com.techguy.entity.product.SubProduct;
 import com.techguy.response.MessageResult;
 import com.techguy.service.ProductService;
@@ -62,6 +63,27 @@ public class AdminSubProductController {
              subProductService.delete(subId);
              result.success("Deleted Success");
              return result;
+        }else {
+            result.error500("Operation failed");
+            return result;
+        }
+    }
+    @PutMapping(value = "/update")
+    public MessageResult<SubProduct> addSubProduct(@RequestBody SubProductVo subProductVo){
+        MessageResult<SubProduct> result =new MessageResult<>();
+        SubProduct subProduct = subProductService.findBySubProductId(subProductVo.getId());
+
+        if(subProduct!=null){
+            subProduct.setUnitPrice(subProductVo.getUnitPrice());
+            subProduct.setDescription(subProductVo.getDescription());
+            subProduct.setName(subProductVo.getName());
+            subProduct.setImageUrl(subProductVo.getImageUrl());
+            subProduct.setFromImgUrl(subProductVo.getFromImgUrl());
+            subProduct.setFree(subProductVo.getFree());
+
+            subProductService.update(subProduct);
+            result.success("Update success");
+            return result;
         }else {
             result.error500("Operation failed");
             return result;

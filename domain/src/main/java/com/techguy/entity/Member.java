@@ -49,6 +49,8 @@ public class Member implements Serializable {
     private String back;
     private String face;
 
+//    private Integer frozen;
+
 
 
 

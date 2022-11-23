@@ -1,6 +1,7 @@
 package com.techguy.admin.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.techguy.entity.product.Product;
 import lombok.Data;
 
@@ -22,6 +23,7 @@ public class SubProductVo {
     private Date createTime;
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
+
     private String imageUrl;
     private String fromImgUrl;
     private String description;

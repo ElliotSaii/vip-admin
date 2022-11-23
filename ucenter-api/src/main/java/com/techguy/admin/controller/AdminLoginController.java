@@ -38,9 +38,7 @@ public class AdminLoginController {
             return result;
         }
         if (admin == null) {
-            result.setSuccess(false);
-            result.setMessage("Email has not register yet!");
-            result.setResult(null);
+            result.error500("Email has not register yet!");
             return result;
         }
 

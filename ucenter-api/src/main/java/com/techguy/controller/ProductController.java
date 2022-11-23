@@ -66,6 +66,8 @@ public class ProductController {
         for (Product product : productList) {
             ProductRecord productRecord = productRecordService.findByMemberIdAndProductId(memberId,product.getId(),type);
             ProductDTO productDTO = new ProductDTO();
+
+
             if(productRecord!=null){
                 if (product.getId().equals(productRecord.getProductId())) {
                     productDTO.setProductRecord(productRecord);
