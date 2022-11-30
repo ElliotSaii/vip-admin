@@ -26,7 +26,8 @@ public interface ProductRepository extends  PagingAndSortingRepository <Product,
 //    Page<Product> findAll(Pageable page,Long memberId);
 
 
-    List<Product> findByNameContains(String name);
+    Page<Product> findByNameIsContaining(String name,Pageable pageable);
+
     @Query(value = "SELECT * from product  where :currentTime>= start_time and :currentTime<=end_time or free=1",nativeQuery = true)
     Page<Product> findProductBetweenStartTimeAndEndTime(@Param("currentTime") String currentTime, Pageable page);
 }

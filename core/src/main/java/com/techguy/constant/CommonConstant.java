@@ -10,4 +10,5 @@ public interface CommonConstant {
  String UPLOAD_TYPE_LOCAL = "local";
  String ACCOUNT_NOT_FOUND ="account not found" ;
     Integer TOKEN_EXPIRED = 403;
+
 }

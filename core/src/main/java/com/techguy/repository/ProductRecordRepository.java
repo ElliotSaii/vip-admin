@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
 @Repository
 public interface ProductRecordRepository extends PagingAndSortingRepository<ProductRecord,Long>{
 
-    List<ProductRecord> findByMemberId(Long memberId, Pageable page);
+    Page<ProductRecord> findByMemberIdAndBuyStatus(Long memberId,Integer status, Pageable page);
 
     ProductRecord findBySubProductId(Long subProductId);
 
@@ -43,4 +44,15 @@ public interface ProductRecordRepository extends PagingAndSortingRepository<Prod
   Page<ProductRecord> findAllByBuyStatus(Pageable page,Integer status);
 
   Page<ProductRecord> findByNameContains(String name, Pageable pageable);
+
+    @Query(value = "SELECT * from product_record  where :memberId=member_id and name like %:name%  and date(:startDate)<= date (create_time)and date (create_time)<=date (:endDate) and :status=buy_status",nativeQuery = true)
+    Page<ProductRecord> findBetweenDateAndName(@Param("memberId")Long memberId,@Param("name")String name, @Param("startDate")String startDate,@Param("endDate")String endDate,@Param("status")Integer status, Pageable pageable);
+
+    @Query(value = "SELECT * from product_record  where :memberId=member_id and date(:startDate)<= date (create_time)and date (create_time)<=date (:endDate) and :status=buy_status",nativeQuery = true)
+    Page<ProductRecord> findBetweenDate(@Param("memberId")Long memberId, @Param("startDate")String startDate,@Param("endDate")String endDate,@Param("status")Integer status, Pageable pageable);
+
+    @Query(value = "SELECT * from product_record where :memberId=member_id and date (:time)=date (create_time) and :status=buy_status",nativeQuery = true)
+    Page<ProductRecord> findByMemberIdAndCreateTime(@Param("memberId") Long memberId,@Param("time") String time,@Param("status") Integer status,Pageable pageable);
+
+    Page<ProductRecord> findByMemberIdAndNameContainingAndBuyStatus(Long memberId,String name,Integer status,Pageable pageable);
 }

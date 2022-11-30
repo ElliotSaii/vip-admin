@@ -1,7 +1,6 @@
 package com.techguy.service;
 
 
-import com.techguy.dto.MemberDTO;
 import com.techguy.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,5 +27,6 @@ public interface MemberService extends UserDetailsService {
 
     Member findByInvCode(String invCode);
 
-    Page<Member> findByName(String name, Pageable page);
+
+    Page<Member> searchName(String name, Pageable page);
 }

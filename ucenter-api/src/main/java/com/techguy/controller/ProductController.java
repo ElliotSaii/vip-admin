@@ -97,9 +97,7 @@ public class ProductController {
             }
         }
 
-            result.setSuccess(true);
-            result.setCode(CommonConstant.OK_200);
-            result.setMessage("Product list");
+            result.success("Product list");
             result.setResult(productDTOList);
             return result;
     }
@@ -148,9 +146,7 @@ public class ProductController {
       if(bankList.size()>0) {
           for (Bank bank : bankList) {
               if (bank.getBanKVersion() == 2) {
-                  result.setSuccess(true);
-                  result.setCode(CommonConstant.OK_200);
-                  result.setMessage("Bank with " + bank.getBanKVersion());
+                  result.success("Bank with " + bank.getBanKVersion());
                   result.setResult(bank);
                   return result;
                 }

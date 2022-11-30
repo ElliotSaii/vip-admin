@@ -15,4 +15,11 @@ public interface WithdrawRecordService {
 
     Page<WithdrawRecord> findByMemberId(Long memberId, Pageable page);
 
+    Page<WithdrawRecord> findByStartAndEnd(Long memberId, String startDate, String endDate, Integer status, Pageable page);
+
+    Page<WithdrawRecord> findByStartAndEnd(Long memberId, String startDate, String endDate, Pageable page);
+
+    Page<WithdrawRecord> findByDay(Long memberId, String startDate, Integer status, Pageable page);
+
+    Page<WithdrawRecord> findByStatus(Long memberId,Integer status, Pageable page);
 }

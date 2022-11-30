@@ -1,4 +1,5 @@
 package com.techguy.controller;
+import com.techguy.config.LocaleMessageSourceService;
 import com.techguy.entity.Member;
 import com.techguy.entity.MemberBank;
 import com.techguy.entity.Withdraw;
@@ -25,15 +26,17 @@ public class MemberBankController {
     private final WithdrawService withdrawService;
     private final WithdrawRecordService withdrawRecordService;
     private final PasswordEncoder passwordEncoder;
+    private final LocaleMessageSourceService messageSourceService;
 
     @Autowired
-    public MemberBankController(MemberService memberService, MemberBankService memberBankService, WithdrawService withdrawService, WithdrawRecordService withdrawRecordService, PasswordEncoder passwordEncoder){
+    public MemberBankController(MemberService memberService, MemberBankService memberBankService, WithdrawService withdrawService, WithdrawRecordService withdrawRecordService, PasswordEncoder passwordEncoder, LocaleMessageSourceService messageSourceService){
 
         this.memberService = memberService;
         this.memberBankService = memberBankService;
         this.withdrawService = withdrawService;
         this.withdrawRecordService = withdrawRecordService;
         this.passwordEncoder = passwordEncoder;
+        this.messageSourceService = messageSourceService;
     }
     @PostMapping("/bind")
     public MessageResult<?> binding(@RequestParam("memberId")Long memberId,@RequestParam("type")Integer type,
@@ -51,7 +54,7 @@ public class MemberBankController {
                 memberBank.setAlipayAccNo(alipayAccNo);
                 memberBank.setCreateTime(new Date());
                 memberBankService.save(memberBank);
-                result.success("Binding alipay success!");
+                result.success(messageSourceService.getMessage("BINDING_SUCCESS"));
                 result.setResult(memberBank);
                 return result;
             }else if(type==2){
@@ -63,7 +66,7 @@ public class MemberBankController {
                 memberBank.setBankBranchName(bankBranchName);
                 memberBank.setCreateTime(new Date());
                 memberBankService.save(memberBank);
-                result.success("Binding bank success!");
+                result.success(messageSourceService.getMessage("BINDING_SUCCESS"));
                 result.setResult(memberBank);
                 return result;
             }
@@ -92,7 +95,7 @@ public class MemberBankController {
                     bank.setAlipayAccName(alipayAccName);
                     bank.setAlipayAccNo(alipayAccNo);
                     MemberBank updateBank = memberBankService.update(bank);
-                    result.success("Update alipay success");
+                    result.success(messageSourceService.getMessage("UPDATE_SUCCESS"));
                     result.setResult(updateBank);
                     return result;
 
@@ -104,7 +107,7 @@ public class MemberBankController {
                     bank.setBankName(bankName);
                     bank.setBankBranchName(bankBranchName);
                     MemberBank updateBank = memberBankService.update(bank);
-                    result.success("Update bank success");
+                    result.success(messageSourceService.getMessage("UPDATE_SUCCESS"));
                     result.setResult(updateBank);
                     return result;
                 }
@@ -136,7 +139,7 @@ public class MemberBankController {
            result.setResult(memberBankList);
            return result;
        }else {
-           result.error500("Not binding yet");
+           result.error500(messageSourceService.getMessage("NOT_BINDING_YET"));
            return result;
        }
     }
@@ -156,7 +159,7 @@ public class MemberBankController {
         if(member!=null && memberBank!=null){
 
             if(!passwordEncoder.matches(fundPassword,member.getFundPassword())){
-                result.error500("Password not matches");
+                result.error500(messageSourceService.getMessage("PASSWORD_NOT_MATCH"));
                 return result;
             }
 
@@ -177,13 +180,13 @@ public class MemberBankController {
 
 
             if(lessThan(memBalance,withdrawAmount)){
-                result.error500("Balance is not enough!");
+                result.error500(messageSourceService.getMessage("BALANCE_NOT_ENOUGH"));
                 return result;
             }else if(lessThan(withdrawAmount,minAmount)){
-                result.error500("Min amount 100!");
+                result.error500(messageSourceService.getMessage("MIN_AMOUNT")+minAmount);
                 return result;
             }else if (!lessThan(withdrawAmount,maxAmount)){
-                result.error500("Max amount 900!");
+                result.error500(messageSourceService.getMessage("MAX_AMOUNT")+maxAmount);
                 return result;
             }
             MathContext mc = new MathContext(9);
@@ -210,7 +213,7 @@ public class MemberBankController {
                 withdrawRecord.setCreateTime(new Date());
                 WithdrawRecord saveWithdrawRecord = withdrawRecordService.save(withdrawRecord);
 
-                result.success("Operation success");
+                result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
                 result.setResult(saveWithdrawRecord);
                 return result;
             }
@@ -231,14 +234,14 @@ public class MemberBankController {
                 withdrawRecord.setCreateTime(new Date());
 
                 WithdrawRecord saveWithdrawRecord = withdrawRecordService.save(withdrawRecord);
-                result.success("Operation success");
+                result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
                 result.setResult(saveWithdrawRecord);
                 return result;
             }
             return result;
         }
         else {
-            result.error500("Operation failed");
+            result.error500(messageSourceService.getMessage("OPERATION_FAIL"));
             return result;
         }
     }
@@ -249,7 +252,7 @@ public class MemberBankController {
         String withdrawId ="101";
         Withdraw withdraw = withdrawService.findById(Long.parseLong(withdrawId));
         if(withdraw!=null){
-            result.success("");
+            result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
             result.setResult(withdraw);
             return  result;
         }

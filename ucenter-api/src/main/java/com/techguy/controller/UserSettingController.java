@@ -1,6 +1,7 @@
 package com.techguy.controller;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.techguy.config.LocaleMessageSourceService;
 import com.techguy.constant.CommonConstant;
 import com.techguy.entity.Member;
 import com.techguy.response.MessageResult;
@@ -8,7 +9,6 @@ import com.techguy.service.MemberService;
 import com.techguy.utils.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,12 +20,14 @@ public class UserSettingController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String,Object> redisTemplate;
+    private final LocaleMessageSourceService messageSourceService;
 
    @Autowired
-   public UserSettingController(MemberService memberService, PasswordEncoder passwordEncoder, RedisTemplate<String, Object> redisTemplate){
+   public UserSettingController(MemberService memberService, PasswordEncoder passwordEncoder, RedisTemplate<String, Object> redisTemplate, LocaleMessageSourceService messageSourceService){
        this.memberService = memberService;
        this.passwordEncoder = passwordEncoder;
        this.redisTemplate = redisTemplate;
+       this.messageSourceService = messageSourceService;
    }
     @PostMapping(value = "/realName")
     public MessageResult<Member> setRealName(@RequestParam("memberId") Long memberId,@RequestParam("name")String name,@RequestParam("cardNumber")String cardNumber,
@@ -36,12 +38,15 @@ public class UserSettingController {
         if (member != null) {
             Integer realNameStatus = member.getRealNameStatus();
             if(realNameStatus==2){
-                result.error500("RealName Already authenticated!");
+                result.error500(messageSourceService.getMessage("REALNAME_AUTHENTICATED"));
                 return result;
             }
+
+
             member.setRealNameStatus(1);
             member.setName(name);
             member.setCardNumber(cardNumber);
+            member.setUsername(name);
             member.setFront(front);
             member.setBack(back);
             member.setFace(face);
@@ -50,12 +55,12 @@ public class UserSettingController {
 
             if (appMember != null) {
                 result.setSuccess(true);
-                result.setMessage("Pending real name");
+                result.setMessage(messageSourceService.getMessage("PENDING_REQ"));
                 result.setResult(appMember.getRealNameStatus());
                 return  result;
             }
             else {
-                result.error500("Invalid user id: "+memberId);
+                result.error500(messageSourceService.getMessage("OPERATION_FAIL"));
                 return result;
             }
         }
@@ -75,13 +80,13 @@ public class UserSettingController {
 
                 result.setSuccess(true);
                 result.setCode(CommonConstant.OK_200);
-                result.setMessage("Generated fund password");
+                result.setMessage(messageSourceService.getMessage("GENERATED_FUN_PSW"));
                 result.setResult(password);
                 return result;
             }else {
                 result.setSuccess(false);
                 result.setCode(500);
-                result.setMessage("Fund Password must have 6 character");
+                result.setMessage(messageSourceService.getMessage("PASSWORD_LENGTH"));
                 result.setResult(null);
                 return  result;
             }
@@ -95,8 +100,7 @@ public class UserSettingController {
         Member member = memberService.findByMemberId(memberId);
 
         if (member != null) {
-            result.setSuccess(true);
-            result.setCode(CommonConstant.OK_200);
+            result.success(messageSourceService.getMessage("REALNAME_AUTHENTICATED"));
             result.setResult(member.getRealNameStatus());
             return result;
         }
@@ -115,7 +119,7 @@ public class UserSettingController {
 
              result.setCode(CommonConstant.OK_200);
              result.setSuccess(true);
-             result.setMessage("Set Profile Successful!");
+             result.setMessage(messageSourceService.getMessage("OPERATION_SUCCESS"));
              result.setResult(mem.getHeadIcon());
              return result;
          }
@@ -137,7 +141,7 @@ public class UserSettingController {
                 if(ObjectUtil.isEmpty(code) || ObjectUtil.isNull(code) || !code.equals(checkCode)){
                     result.setSuccess(false);
                     result.setCode(CommonConstant.INTERNAL_SERVER_ERROR_500);
-                    result.setMessage(CommonConstant.VERIFY_CODE_WRONG);
+                    result.setMessage(messageSourceService.getMessage(CommonConstant.VERIFY_CODE_WRONG));
                     result.setResult(null);
                     return result;
                 }
@@ -145,12 +149,12 @@ public class UserSettingController {
                 member.setEmail(newEmail);
                 Member mem = memberService.update(member);
                 appMember.setEmail(mem.getEmail());
-                result.setMessage("Change email success!");
+                result.setMessage(messageSourceService.getMessage("CHANGE_SUCCESS"));
                 result.setResult(appMember.getEmail());
                 redisTemplate.delete(realKey);
                 return result;
             }
-            result.error500("Email not register yet!");
+            result.error500(messageSourceService.getMessage("MAIL_NOT_REGISTER"));
             return result;
         }
         return result;
@@ -165,14 +169,14 @@ public class UserSettingController {
             throw new RuntimeException(String.format("Invalid id %s",memberId));
         }
         if (Objects.equals(member.getUsername(), username)){
-            result.error500("Already set! "+username);
+            result.error500(messageSourceService.getMessage("ALREADY_SET")+username);
             return result;
         }
         member.setUsername(username);
         Member mem = memberService.update(member);
         appMember.setUsername(mem.getUsername());
 
-        result.success("Set username success");
+        result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
         result.setResult(appMember.getUsername());
         return result;
     }
@@ -184,13 +188,13 @@ public class UserSettingController {
             Member member = memberService.findByMemberId(memberId);
             if(member !=null) {
                 if (Objects.equals(member.getSex(), sex)) {
-                    result.error500("Already set! "+sex);
+                    result.error500(messageSourceService.getMessage("ALREADY_SET"));
                     return result;
                 }
                 member.setSex(sex);
                 Member mem = memberService.update(member);
                 appMember.setSex(mem.getSex());
-                result.success("Set gender success");
+                result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
                 result.setResult(appMember.getSex());
                 return result;
             }
@@ -203,8 +207,8 @@ public class UserSettingController {
             Member appMember = new Member();
            Member member = memberService.findByMemberId(memberId);
             if (member.getFundPassword()!=null && passwordEncoder.matches(oldFundPassword,member.getFundPassword())) {
-                if (!(newFundPassword.length() >4)) {
-                    result.error500("Password not strong enough!");
+                if (!(newFundPassword.length() >5)) {
+                    result.error500(messageSourceService.getMessage("PASSWORD_LENGTH"));
                     return result;
                 }
                 if (passwordEncoder.matches(newFundPassword,member.getFundPassword())){
@@ -216,12 +220,14 @@ public class UserSettingController {
                 Member mem = memberService.update(member);
                 if(mem !=null){
                     appMember.setFundPassword(mem.getFundPassword());
-                    result.success("Change Fund password success");
+                    result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
                     result.setResult(appMember.getFundPassword());
                     return result;
                 }
+            }else {
+                result.error500(messageSourceService.getMessage("PWD_NOT_CORRECT"));
+                return result;
             }
-            result.error500("Password is not correct!");
             return result;
         }
 
@@ -233,7 +239,7 @@ public class UserSettingController {
             if (member != null) {
                 if(passwordEncoder.matches(oldPassword,member.getPassword())){
                     if (!(newPassword.length() >5)) {
-                        result.error500("Password not strong enough!");
+                        result.error500(messageSourceService.getMessage("PASSWORD_LENGTH"));
                         return result;
                     }
                     if (passwordEncoder.matches(newPassword,member.getPassword())){
@@ -245,13 +251,13 @@ public class UserSettingController {
                     Member mem = memberService.update(member);
                     if(mem!=null){
                         appMember.setPassword(newPassword);
-                        result.success("Change Login Password Success!");
+                        result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
                         result.setResult(appMember.getPassword());
                         return result;
                     }
                 }
                 else {
-                    result.error500("Password is not correct!");
+                    result.error500(messageSourceService.getMessage("PWD_NOT_CORRECT"));
                 }
             }
             return result;

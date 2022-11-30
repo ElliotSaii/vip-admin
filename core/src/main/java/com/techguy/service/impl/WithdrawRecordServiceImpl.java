@@ -49,4 +49,24 @@ public class WithdrawRecordServiceImpl implements WithdrawRecordService {
     public Page<WithdrawRecord> findByMemberId(Long memberId, Pageable page) {
         return withdrawRecordRepository.findAllByMemberId(memberId,page);
     }
+
+    @Override
+    public Page<WithdrawRecord> findByStartAndEnd(Long memberId, String startDate, String endDate, Integer status, Pageable page) {
+        return withdrawRecordRepository.findBetweenStarAndEnd(memberId,startDate,endDate,status,page);
+    }
+
+    @Override
+    public Page<WithdrawRecord> findByStartAndEnd(Long memberId, String startDate, String endDate, Pageable page) {
+        return withdrawRecordRepository.findBetweenStarAndEnd(memberId,startDate,endDate,page);
+    }
+
+    @Override
+    public Page<WithdrawRecord> findByDay(Long memberId, String day, Integer status, Pageable page) {
+        return withdrawRecordRepository.findByDay(memberId,day,status,page);
+    }
+
+    @Override
+    public Page<WithdrawRecord> findByStatus(Long memberId,Integer status, Pageable page) {
+        return withdrawRecordRepository.findByMemberIdAndStatus(memberId,status,page);
+    }
 }

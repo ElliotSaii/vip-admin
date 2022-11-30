@@ -31,7 +31,8 @@ public interface ProductService {
 
     List<Product> findAll();
 
-    List<Product> findByName(String name);
 
     void delete(Long id);
+
+    Page<Product> searchByName(String name, Pageable page);
 }

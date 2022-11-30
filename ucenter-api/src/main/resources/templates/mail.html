@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:remove="all">Template for HTML email</title>
+    <title th:remove="all">VIP Org Mail</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <body>
 <p>
-    Hello,<b><span th:text="${name}"></span>!</b>
+    Hello, &nbsp; <b><span th:text="${name}"></span></b>
 </p>
 <p>
-    Your verification code- <span th:text="${code}" style="color : blue"></span>  <b>VIP</b>
+    Your verify code: <span th:text="${code}" style="color : blue"></span>
+    <br/>
     <span th:text="${date}"></span>
 </p>
 <p>
     Regards, <br/>
-    <em>The VIP Organization</em>
+    <em>VIP Organization</em>
 </p>
 </body>
 </html>

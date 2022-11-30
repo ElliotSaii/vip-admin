@@ -74,8 +74,8 @@ public class ProductRecordServiceImpl implements ProductRecordService {
     }
 
     @Override
-    public List<ProductRecord> findProductRecordByMemId(Long memberId, Pageable page) {
-        return productRecordRepository.findByMemberId(memberId,page);
+    public Page<ProductRecord> findProductRecordByMemId(Long memberId,Integer status, Pageable page) {
+        return productRecordRepository.findByMemberIdAndBuyStatus(memberId,status,page);
     }
 
     @Override
@@ -160,6 +160,26 @@ public class ProductRecordServiceImpl implements ProductRecordService {
     @Override
     public Page<ProductRecord> filterByName(String name,Pageable pageable) {
         return productRecordRepository.findByNameContains(name,pageable);
+    }
+
+    @Override
+    public Page<ProductRecord> findBetweenDateAndName(Long memberId,String name, String startDate, String endDate,Integer status, Pageable page) {
+        return productRecordRepository.findBetweenDateAndName(memberId,name,startDate,endDate,status,page);
+    }
+
+    @Override
+    public Page<ProductRecord> findByDay(Long memberId,String start,Integer status, Pageable page) {
+        return productRecordRepository.findByMemberIdAndCreateTime(memberId,start,status,page);
+    }
+
+    @Override
+    public Page<ProductRecord> findByName(Long memberId, String name,Integer status, Pageable page) {
+        return productRecordRepository.findByMemberIdAndNameContainingAndBuyStatus(memberId,name,status,page);
+    }
+
+    @Override
+    public Page<ProductRecord> findBetweenDate(Long memberId, String startDate, String endDate, Integer status, Pageable page) {
+        return productRecordRepository.findBetweenDate(memberId,startDate,endDate,status,page);
     }
 
 }

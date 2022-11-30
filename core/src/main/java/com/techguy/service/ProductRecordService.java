@@ -1,6 +1,7 @@
 package com.techguy.service;
 
 import com.techguy.entity.product.ProductRecord;
+import lombok.Lombok;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,7 +25,7 @@ public interface ProductRecordService {
     ProductRecord findByProductId(Long productId,Long memberId);
 
 
-    List<ProductRecord> findProductRecordByMemId(Long memberId, Pageable page);
+    Page<ProductRecord> findProductRecordByMemId(Long memberId,Integer status, Pageable page);
 
     List<ProductRecord> findAll();
 
@@ -53,4 +54,12 @@ public interface ProductRecordService {
    ProductRecord findSubInRecord(Long subId, Long productId,Long memberId, Integer type);
 
     Page<ProductRecord> filterByName(String name,Pageable pageable);
+
+    Page<ProductRecord> findBetweenDateAndName(Long memberId,String name, String startDate, String endDate,Integer status, Pageable page);
+
+    Page<ProductRecord> findByDay(Long memberId,String start,Integer status, Pageable page);
+
+    Page<ProductRecord> findByName(Long memberId, String name,Integer status, Pageable page);
+
+    Page<ProductRecord> findBetweenDate(Long memberId, String startDate, String endDate, Integer status, Pageable page);
 }

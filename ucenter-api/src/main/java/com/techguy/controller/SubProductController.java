@@ -1,7 +1,7 @@
 package com.techguy.controller;
 
+import com.techguy.config.LocaleMessageSourceService;
 import com.techguy.constant.CommonConstant;
-import com.techguy.dto.ProductDTO;
 import com.techguy.dto.SubProductDTO;
 import com.techguy.entity.Member;
 import com.techguy.entity.product.Product;
@@ -30,14 +30,16 @@ public class SubProductController {
     private final MemberService memberService;
     private final SubProductRecordService subProductRecordService;
     private final ProductRecordService productRecordService;
+    private final LocaleMessageSourceService messageSourceService;
 
     @Autowired
-    public SubProductController(ProductService productService, SubProductService subProductService, MemberService memberService, SubProductRecordService subProductRecordService, ProductRecordService productRecordService){
+    public SubProductController(ProductService productService, SubProductService subProductService, MemberService memberService, SubProductRecordService subProductRecordService, ProductRecordService productRecordService, LocaleMessageSourceService messageSourceService){
         this.productService=productService;
         this.subProductService=subProductService;
         this.memberService =memberService;
         this.subProductRecordService = subProductRecordService;
         this.productRecordService = productRecordService;
+        this.messageSourceService = messageSourceService;
     }
 //todo delete
     /**
@@ -161,7 +163,7 @@ public class SubProductController {
             result.setResult(subProductDTOList);
             return result;
         }else {
-            result.error500("No Sub List");
+            result.error500(messageSourceService.getMessage("NO_PRODUCT"));
             return result;
         }
     }
@@ -180,7 +182,7 @@ public class SubProductController {
         SubProductRecord subRecord  = new SubProductRecord();
 
         if(!Objects.equals(subProduct.getProductId(), productId)){
-            result.error500("Operation failed");
+            result.error500(messageSourceService.getMessage("OPERATION_FAIL"));
             return result;
         }
         if (member!=null && product!=null && subProduct!=null &&productRecord==null){
@@ -210,14 +212,13 @@ public class SubProductController {
 //           ProductRecord productRecord1 = new ProductRecord();
 
             if (saveProductRecord == null && saveSubProductRecord==null) {
-                result.error500("Failed to save record");
+                result.error500(messageSourceService.getMessage("OPERATION_FAIL"));
                 return result;
             }
 
 
-            result.setSuccess(true);
-            result.setCode(CommonConstant.OK_200);
-            result.setMessage("Save record success");
+
+            result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
             result.setResult(saveProductRecord);
             return result;
         }
@@ -237,9 +238,7 @@ public class SubProductController {
 
             ProductRecord saveProductRecord = productRecordService.update(record);
 
-            result.setSuccess(true);
-            result.setCode(CommonConstant.OK_200);
-            result.setMessage("Save record success");
+            result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
             result.setResult(saveProductRecord);
             return result;
         }

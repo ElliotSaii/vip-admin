@@ -1,5 +1,6 @@
 package com.techguy.controller;
 
+import com.techguy.config.LocaleMessageSourceService;
 import com.techguy.entity.AppVersion;
 import com.techguy.response.MessageResult;
 import com.techguy.service.AppVersionService;
@@ -9,22 +10,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/app")
 public class AppVersionController {
     private final AppVersionService appVersionService;
+    private final LocaleMessageSourceService messageSourceService;
 
-
-    @GetMapping("/index")
-    public MessageResult<?> home(){
-        return MessageResult.error("index");
-    }
 
     @Autowired
-    public AppVersionController(AppVersionService appVersionService) {
+    public AppVersionController(AppVersionService appVersionService, LocaleMessageSourceService messageSourceService) {
         this.appVersionService = appVersionService;
+        this.messageSourceService = messageSourceService;
     }
 
     @GetMapping("/version")
@@ -33,11 +29,11 @@ public class AppVersionController {
         AppVersion appVersion = appVersionService.findByPlatform(platform);
 
         if(appVersion!=null){
-         result.success("Application Info");
+         result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
          result.setResult(appVersion);
          return  result;
         }else {
-            result.error500("Operation failed");
+            result.error500(messageSourceService.getMessage("OPERATION_FAIL"));
             return result;
         }
 

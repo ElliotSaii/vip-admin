@@ -1,5 +1,6 @@
 package com.techguy.controller;
 
+import com.techguy.config.LocaleMessageSourceService;
 import com.techguy.constant.CommonConstant;
 import com.techguy.entity.Bank;
 import com.techguy.entity.Member;
@@ -9,12 +10,12 @@ import com.techguy.entity.product.ProductRecord;
 import com.techguy.response.MessageResult;
 import com.techguy.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -29,15 +30,17 @@ public class PaymentController {
     private final PaymentServie paymentService;
     private final ProductRecordService productRecordService;
     private final SubProductRecordService subProductRecordService;
+    private final LocaleMessageSourceService messageSourceService;
 
     @Autowired
-    public PaymentController(MemberService memberService, BankService bankService, ProductService productService, PaymentServie paymentService, ProductRecordService productRecordService, SubProductRecordService subProductRecordService){
+    public PaymentController(MemberService memberService, BankService bankService, ProductService productService, PaymentServie paymentService, ProductRecordService productRecordService, SubProductRecordService subProductRecordService, LocaleMessageSourceService messageSourceService){
         this.memberService = memberService;
         this.bankService = bankService;
         this.productService = productService;
         this.paymentService = paymentService;
         this.productRecordService = productRecordService;
         this.subProductRecordService = subProductRecordService;
+        this.messageSourceService = messageSourceService;
     }
 
     @PostMapping("/submit")
@@ -80,9 +83,7 @@ public class PaymentController {
                     payment.setTotalUnitPrice(product.getTotalUnitPrice());
                     payment.setVoucher(voucher);
                     Payment savePayment = paymentService.save(payment);
-                    result.setSuccess(true);
-                    result.setMessage("Paid Success");
-                    result.setCode(CommonConstant.OK_200);
+                    result.success(messageSourceService.getMessage("PAID_SUCCESS"));
                     result.setResult(savePayment);
                 } else {
                     result.error500("Product already bought");
@@ -112,37 +113,31 @@ public class PaymentController {
                 payment.setTotalUnitPrice(product.getTotalUnitPrice());
                 payment.setVoucher(voucher);
                 Payment savePayment = paymentService.save(payment);
-                result.setSuccess(true);
-                result.setMessage("Paid Success");
-                result.setCode(CommonConstant.OK_200);
+                result.success(messageSourceService.getMessage("PAID_SUCCESS"));
                 result.setResult(savePayment);
                 return result;
             }
     }
     @GetMapping("/history")
     public MessageResult<?> pending(@RequestParam("memberId")Long memberId,@RequestParam("status")Integer status,
-                                    @RequestParam(value = "pageNo",defaultValue = "0")Integer pageNo,@RequestParam(value = "pageSize",defaultValue = "10")Integer pageSize) {
+                                    @RequestParam(value = "pageNo")Integer pageNo,@RequestParam(value = "pageSize")Integer pageSize) {
 
         Pageable page = PageRequest.of(pageNo,pageSize,Sort.by("createTime").descending());
 
         MessageResult<ProductRecord> result = new MessageResult<>();
-        List<ProductRecord> productRecordList = productRecordService.findProductRecordByMemId(memberId,page);
+        Page<ProductRecord> productRecordPage = productRecordService.findProductRecordByMemId(memberId,status,page);
 
-        List<ProductRecord> records = new ArrayList<>();
+
+
+        List<ProductRecord> productRecordList = productRecordPage.getContent();
 
         if(!(productRecordList.size() >0)){
-            result.error500("No pending");
+            result.error500(messageSourceService.getMessage("NO_RESULT_FOUND"));
             return result;
         }
-       for( ProductRecord record: productRecordList){
-           if (Objects.equals(record.getBuyStatus(), status)) {
-               records.add(record);
-           }
-         }
-        result.setSuccess(true);
-        result.setCode(CommonConstant.OK_200);
-        result.setMessage("Pending Record");
-        result.setResult(records);
+
+        result.success(messageSourceService.getMessage("HISTORY_LIST"));
+        result.setResult(productRecordList);
         return result;
 
     }

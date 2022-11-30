@@ -3,7 +3,9 @@ package com.techguy.controller;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.techguy.code.OnlyCodeUtils;
+import com.techguy.config.LocaleMessageSourceService;
 import com.techguy.constant.CommonConstant;
+import com.techguy.constant.SysConstant;
 import com.techguy.entity.Member;
 import com.techguy.jwt.JWTUtility;
 import com.techguy.mail.Email;
@@ -17,25 +19,20 @@ import com.techguy.utils.RandImageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.function.ServerRequest;
 
-import javax.mail.Header;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -53,6 +50,7 @@ public class SysController {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final JWTUtility jwtUtility;
+    private final LocaleMessageSourceService messageSourceService;
 
 
 
@@ -65,12 +63,13 @@ public class SysController {
     @Value(value = "${spring.mail.username}")
     private String from;
 
-    public SysController(RedisTemplate<String, Object> redisTemplate, MemberService memberService, PasswordEncoder passwordEncoder, EmailService emailService, JWTUtility jwtUtility) {
+    public SysController(RedisTemplate<String, Object> redisTemplate, MemberService memberService, PasswordEncoder passwordEncoder, EmailService emailService, JWTUtility jwtUtility, LocaleMessageSourceService messageSourceService) {
         this.redisTemplate = redisTemplate;
         this.memberService = memberService;
         this.passwordEncoder =passwordEncoder;
         this.emailService = emailService;
         this.jwtUtility = jwtUtility;
+        this.messageSourceService = messageSourceService;
     }
 
 
@@ -103,7 +102,7 @@ public class SysController {
 
         if (appMember == null) {
             result.setSuccess(false);
-            result.setMessage(CommonConstant.ACCOUNT_NOT_FOUND);
+            result.setMessage(messageSourceService.getMessage("MAIL_NOT_REGISTER"));
             result.setResult(null);
             result.setCode(CommonConstant.INTERNAL_SERVER_ERROR_500);
             return result;
@@ -111,7 +110,7 @@ public class SysController {
         if (password.length()<6) {
             result.setSuccess(false);
             result.setCode(CommonConstant.INTERNAL_SERVER_ERROR_500);
-            result.setMessage("Password must have 6 character");
+            result.setMessage(messageSourceService.getMessage("PASSWORD_LENGTH"));
             result.setResult(null);
             return result;
         }
@@ -121,39 +120,41 @@ public class SysController {
 
         if (ObjectUtil.isEmpty(code) || ObjectUtil.isNull(code) || !lowerCase.equals(checkCode)) {
             result.setSuccess(false);
-            result.setMessage(CommonConstant.VERIFY_CODE_WRONG);
+            result.setMessage(messageSourceService.getMessage("VERIFY_CODE_WRONG"));
             result.setResult(null);
             return result;
         }
 
         appMember.setPassword(passwordEncoder.encode(password));
         Member member = memberService.update(appMember);
-        result.success("reset password successfully");
+        result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
         result.setResult(member);
         redisTemplate.delete(realKey);
         return result;
     }
 
     @PostMapping("/sendMail")
-    public MessageResult<Email> sendMail (@RequestParam("email")String email){
+    public MessageResult<Email> sendMail (@RequestParam("email")String email) {
         MessageResult<Email> result = new MessageResult<>();
 
         Member member = memberService.findByEmail(email);
-        if(member.getEmail().equals(email)){
-            result.error500("Email already exits");
-            return result;
-        }
+        if (member == null) {
 
-        String name= null;
-        if (email.endsWith("@gmail.com")) {
-             name = email.replace("@gmail.com", "");
-        }
-        
+            Object checkCode = redisTemplate.opsForValue().get(SysConstant.EMAIL_BIND_CODE_PREFIX + email);
+            if(checkCode!=null){
+                result.error500(messageSourceService.getMessage("EMAIL_ALREADY_SEND"));
+                return result;
+            }
+
+            String name = null;
+            if (email.endsWith("@gmail.com")) {
+                name = email.replace("@gmail.com", "");
+                 }
+            //store in  redis 1 mins
             String code = OnlyCodeUtils.creatUUID();
-            //store in  redis 3 mins
-        String lowerCase = code.toLowerCase();
-        String realKey = MD5Util.MD5Encode(lowerCase, "utf-8");
-            redisTemplate.opsForValue().set(realKey,lowerCase,3,TimeUnit.MINUTES);
+            String lowerCase = code.toLowerCase();
+            String realKey = MD5Util.MD5Encode(lowerCase, "utf-8");
+            redisTemplate.opsForValue().set(SysConstant.EMAIL_BIND_CODE_PREFIX+email, lowerCase, 3, TimeUnit.MINUTES);
 
             Email mail = new Email();
             mail.setTo(email);
@@ -161,9 +162,9 @@ public class SysController {
             mail.setSubject("VIP Email");
             mail.setTemplate("mail.html");
             Map<String, Object> properties = new HashMap<>();
-            properties.put("name", "Dear "+name);
+            properties.put("name", "Dear " + name);
             properties.put("date", LocalDate.now().toString());
-            properties.put("code",code);
+            properties.put("code", code);
 //            properties.put("technologies", Arrays.asList("Python", "Go", "C#"));
             mail.setProperties(properties);
 
@@ -172,13 +173,22 @@ public class SysController {
             } catch (MessagingException e) {
                 e.printStackTrace();
             }
-            result.setMessage("Sending Email Successfully!");
+            result.setMessage(messageSourceService.getMessage("OPERATION_SUCCESS"));
             result.setCode(CommonConstant.OK_200);
             result.setSuccess(true);
             result.setResult(mail);
 
-        return result;
+            return result;
+        }
+
+        else if(member.getEmail().equals(email)){
+            result.error500(messageSourceService.getMessage("MAIL_ALREADY_EXIT"));
+            return result;
+        }
+      return  result;
+
     }
+
 
 
   @PostMapping(value = "/upload")
@@ -211,13 +221,13 @@ public class SysController {
             savePath = CommonUtils.upload(file,bizPath,uploadType);
       }
       if(ObjectUtil.isNotEmpty(savePath)){
-          result.setMessage("upload success!");
+          result.setMessage(messageSourceService.getMessage("UPLOAD_SUCCESS"));
           result.setSuccess(true);
           result.setCode(CommonConstant.OK_200);
           result.setResult(savePath);
           return result;
       } else {
-        result.error500("upload failed");
+        result.error500(messageSourceService.getMessage("UPLOAD_FAIL"));
           return result;
       }
   }

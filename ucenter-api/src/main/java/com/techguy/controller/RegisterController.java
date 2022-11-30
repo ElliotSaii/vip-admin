@@ -1,8 +1,10 @@
 package com.techguy.controller;
 
 import com.techguy.code.OnlyCodeUtils;
+import com.techguy.config.LocaleMessageSourceService;
 import com.techguy.constant.CommonConstant;
 import com.techguy.constant.ErrorConstantMsg;
+import com.techguy.constant.SysConstant;
 import com.techguy.utils.MD5Util;
 import com.techguy.vo.RegisterVo;
 import com.techguy.entity.Member;
@@ -26,40 +28,34 @@ public class RegisterController {
     private final RedisTemplate redisTemplate;
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
+    private final LocaleMessageSourceService messageSourceService;
 
     @PostMapping(value = "/register1")
     public MessageResult<Member> register(@RequestParam(value = "email")String email,@RequestParam(value = "code")String code,@RequestParam(value = "password")String password,@RequestParam(value = "invCode",required = false)String upId){
         MessageResult<Member> result = new MessageResult<>();
         boolean valid = ValidateUtil.validate(email);
+//      String realKey = MD5Util.MD5Encode(code , "utf-8");
 
-      code = code.toLowerCase();
-      String realKey = MD5Util.MD5Encode(code , "utf-8");
-      Object checkCode = redisTemplate.opsForValue().get(realKey);
+      Object checkCode = redisTemplate.opsForValue().get(SysConstant.EMAIL_BIND_CODE_PREFIX+email);
+        code = code.toLowerCase();
       //check code
       if(checkCode==null || checkCode.equals("") || !code.equals(checkCode)) {
-          result.setMessage(ErrorConstantMsg.VERIFY_CODE_WRONG);
-          result.setCode(CommonConstant.INTERNAL_SERVER_ERROR_500);
+          result.error500(messageSourceService.getMessage("VERIFY_CODE_WRONG"));
           result.setResult(null);
           return result;
       }
       if(!valid){
-          result.setSuccess(false);
-          result.setMessage("Enter valid email");
-          result.setResult(null);
+          result.error500(messageSourceService.getMessage("ENTER_VALID_EMAIL"));
           return result;
       }
       if (!(password.length() >=5)){
-          result.setSuccess(false);
-          result.setMessage("password must have 6 character at least");
-          result.setResult(null);
+          result.error500(messageSourceService.getMessage("PASSWORD_LENGTH"));
           return result;
       }
       Member newMember = memberService.findByEmail(email);
 
         if (newMember != null) {
-          result.setSuccess(false);
-          result.setMessage("Email already exits");
-          result.setResult(null);
+          result.error500(messageSourceService.getMessage("MAIL_ALREADY_EXIT"));
           return result;
          }
         else {
@@ -70,14 +66,13 @@ public class RegisterController {
                     Member mem = memberService.register(newMember, encodePW, email, upId);
                     if (mem != null) {
                         redisTemplate.delete(checkCode);
-                        result.setCode(CommonConstant.OK_200);
-                        result.setMessage("Registered success!");
-                        result.setSuccess(true);
+
+                        result.success(messageSourceService.getMessage("REGISTER_SUCCESS"));
                         result.setResult(mem);
                         log.info("Member Register {}", mem.getEmail());
                         return result;
                     } else {
-                        result.error500("Failed to register");
+                        result.error500("OPERATION_FAIL");
                         return result;
                     }
                 }else {
@@ -89,9 +84,8 @@ public class RegisterController {
                 Member mem = memberService.register(newMember, encodePW, email, upId);
                 if (mem != null) {
                     redisTemplate.delete(checkCode);
-                    result.setCode(CommonConstant.OK_200);
-                    result.setMessage("Registered success!");
-                    result.setSuccess(true);
+
+                    result.success(messageSourceService.getMessage("REGISTER_SUCCESS"));
                     result.setResult(mem);
                     log.info("Member Register {}", mem.getEmail());
                     return result;

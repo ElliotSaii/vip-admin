@@ -1,7 +1,6 @@
 package com.techguy.controller;
 
-import com.techguy.entity.Member;
-import com.techguy.entity.Withdraw;
+import com.techguy.config.LocaleMessageSourceService;
 import com.techguy.entity.WithdrawRecord;
 import com.techguy.response.MessageResult;
 import com.techguy.service.MemberService;
@@ -14,8 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -24,12 +21,14 @@ public class WalletController {
     private final MemberService memberService;
     private final WithdrawService withdrawService;
     private final WithdrawRecordService withdrawRecordService;
+    private final LocaleMessageSourceService messageSourceService;
 
     @Autowired
-    public WalletController(MemberService memberService, WithdrawService withdrawService, WithdrawRecordService withdrawRecordService){
+    public WalletController(MemberService memberService, WithdrawService withdrawService, WithdrawRecordService withdrawRecordService, LocaleMessageSourceService messageSourceService){
         this.memberService= memberService;
         this.withdrawService = withdrawService;
         this.withdrawRecordService = withdrawRecordService;
+        this.messageSourceService = messageSourceService;
     }
 
     @GetMapping("/withdraw/record")
@@ -44,7 +43,7 @@ public class WalletController {
             result.setResult(withdrawRecordList);
             return  result;
         }else {
-            result.error500("No Withdraw Record list");
+            result.error500(messageSourceService.getMessage("NO_RESULT_FOUND"));
             return result;
         }
 

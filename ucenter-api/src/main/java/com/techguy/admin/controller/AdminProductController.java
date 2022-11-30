@@ -71,7 +71,6 @@ public class AdminProductController {
         subProduct.setProductId(subProductVo.getProductId());
         subProduct.setBuyStatus(0);
         subProduct.setName(subProductVo.getName());
-        subProduct.setFree(subProductVo.getFree());
         subProduct.setUnitPrice(subProductVo.getUnitPrice());
         subProduct.setImageUrl(subProductVo.getImageUrl());
         subProduct.setFromImgUrl(subProductVo.getFromImgUrl());
@@ -123,15 +122,19 @@ public class AdminProductController {
         return result;
     }
 
-    //todo filter between start and end date
+
     @GetMapping(value = "/main-product/list")
-    public MessageResult<?> list (@RequestParam("pageNo")Integer pageNo,@RequestParam("pageSize")Integer pageSize){
-//        pageNo = (pageNo-1)*pageSize;
+    public MessageResult<?> list (@RequestParam("pageNo")Integer pageNo,@RequestParam("pageSize")Integer pageSize,@RequestParam(value = "name",required = false)String name){
+
         MessageResult<?> result = new MessageResult<>();
-//        Date currentTime =new Date();
         Pageable page = PageRequest.of(pageNo - 1,pageSize, Sort.by("createTime").descending());
 
-        Page<Product> productPage = productService.findAll(page);
+        Page<Product> productPage=null;
+        if(name!=null && !name.isEmpty()){
+            productPage = productService.searchByName(name, page);
+        }else {
+             productPage = productService.findAll(page);
+        }
 
         List<Product> productList = productPage.getContent();
         long totalPages = productPage.getTotalPages();
@@ -156,22 +159,6 @@ public class AdminProductController {
             result.error500("No product list");
             return result;
         }
-    }
-
-    @GetMapping("/search")
-    public MessageResult<?> search(@RequestParam("name")String name){
-        MessageResult<?> result =new MessageResult<>();
-
-       List<Product> productNames = productService.findByName(name);
-       if(productNames.size()>0){
-           result.success("operation success");
-           result.setResult(productNames);
-           return result;
-       }else {
-           result.error500("operation failed");
-           return result;
-       }
-
     }
 
     /*

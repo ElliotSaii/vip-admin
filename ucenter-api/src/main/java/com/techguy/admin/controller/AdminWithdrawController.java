@@ -53,6 +53,7 @@ public class AdminWithdrawController {
     }
 
     @PutMapping("/auth")
+
     public MessageResult<?> authWithdrawStatus(@RequestParam("recordId")Long recordId,@RequestParam(value = "oneTimePassword",required = false)String oneTimePassword,
     @RequestParam("status")Integer status,@RequestParam(value = "reason",required = false)String reason){
         MessageResult<?> result = new MessageResult<>();

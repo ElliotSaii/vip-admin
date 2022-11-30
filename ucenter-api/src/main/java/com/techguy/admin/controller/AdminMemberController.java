@@ -62,7 +62,12 @@ public class AdminMemberController {
     public  MessageResult<?> authRealName(@RequestParam("memberId")Long memberId,@RequestParam("status")Integer status){
         MessageResult<?> result =new MessageResult<>();
         Member member = memberService.findByMemberId(memberId);
+
         if(member!=null){
+            if(status==3){
+                member.setName(null);
+                member.setUsername(null);
+            }
             member.setRealNameStatus(status);
             memberService.update(member);
             result.success("Operation Success");
@@ -72,12 +77,19 @@ public class AdminMemberController {
     }
 
     @GetMapping("/list")
-    public MessageResult<?> list(@RequestParam("pageNo")Integer pageNo,@RequestParam("pageSize")Integer pageSize){
+    public MessageResult<?> list(@RequestParam("pageNo")Integer pageNo,@RequestParam("pageSize")Integer pageSize,@RequestParam("name")String name){
         MessageResult<?> result=new MessageResult<>();
         Map<String,Object>map =new HashMap<>();
         pageNo=pageNo-1;
         Pageable page =PageRequest.of(pageNo,pageSize,Sort.by("cnyBalance").descending());
-        Page<Member> memberPage = memberService.findAll(page);
+        Page<Member> memberPage=null;
+
+        if(name!=null && !name.isEmpty()){
+            memberPage = memberService.searchName(name,page);
+        }else {
+             memberPage = memberService.findAll(page);
+        }
+
         List<Member> memberList = memberPage.getContent();
         long totalElements = memberPage.getTotalElements();
         map.put("totalElements",totalElements);
@@ -90,29 +102,5 @@ public class AdminMemberController {
             result.error500("Operation failed");
             return result;
         }
-
     }
-
-    @GetMapping("/search")
-    public MessageResult<?> search(@RequestParam("name")String name,@RequestParam("pageNo")Integer pageNo,@RequestParam("pageSize")Integer pageSize){
-        MessageResult<?> result =new MessageResult<>();
-        Pageable page =PageRequest.of(pageNo,pageSize);
-        Map<String,Object> map =new HashMap<>();
-
-      Page<Member> memberPage =  memberService.findByName(name,page);
-
-        long totalElements = memberPage.getTotalElements();
-        map.put("totalElements",totalElements);
-        List<Member> memberList = memberPage.getContent();
-        if(memberList.size()>0){
-            map.put("list",memberList);
-            result.success("Found Members");
-            result.setResult(memberList);
-            return result;
-        }else {
-            result.error500("Operation failed");
-            return result;
-        }
-    }
-
 }

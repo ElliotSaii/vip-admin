@@ -44,7 +44,11 @@ public class MemberServiceImpl implements MemberService, Serializable {
 
     @Override
     public Member findByEmail(String email) {
-             return memberRepository.findByEmail(email);
+        try{
+            return memberRepository.findByEmail(email);
+        }catch (NullPointerException e){
+            return null;
+        }
     }
     @Override
     public Member findPassword(String password, String email){
@@ -104,9 +108,11 @@ public class MemberServiceImpl implements MemberService, Serializable {
         return memberRepository.findByInvCode(invCode);
     }
 
+
+
     @Override
-    public Page<Member> findByName(String name, Pageable page) {
-        return memberRepository.findMemberByNameContaining(name,page);
+    public Page<Member> searchName(String name, Pageable page) {
+        return memberRepository.findByUsernameIsContaining(name,page);
     }
 
 

@@ -9,31 +9,22 @@ spring:
     username: root
     password: 123456
 
-# Naming strategy
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+
+
 #  mail
-#  mail:
-#    host: smtp.gmail.com
-#    username: elliotsaii1@gmail.com
-#    password: inrfbjqwjrdzuakv
-#    properties:
-#      mail:
-#        smtp:
-#          ssl:
-#            enable: true
-#          auth: true
-#          starttls:
-#            enable: true
-#            required: true
   mail:
     host: smtp.gmail.com
     username: elliotsaii1@gmail.com
     password: inrfbjqwjrdzuakv
     port: 465
     protocol: smtps
-    smtp:
-      proxy:
-        host: 192.168.10.199
-        port: 7890
+    #    smtp:
+    #      proxy:
+    #        host: 192.168.10.199
+    #        port: 7890
     properties:
       mail:
         transport:
@@ -42,6 +33,25 @@ spring:
           starttls:
             enable: true
           timeout: 8000
+
+#  mail:
+#    host: smtp.gmail.com
+#    username: elliotsaii1@gmail.com
+#    password: inrfbjqwjrdzuakv
+#    port: 465
+#    protocol: smtps
+#    smtp:
+#      proxy:
+#        host: 192.168.10.199
+#        port: 7890
+#    properties:
+#      mail:
+#        transport:
+#          protocol: smtps
+#        smtps:
+#          starttls:
+#            enable: true
+#          timeout: 8000
 
   # redis
   redis:
@@ -59,8 +69,8 @@ spring:
 #File
   servlet:
     multipart:
-      max-request-size: 30MB
-      max-file-size: 30MB
+      max-request-size: 60MB
+      max-file-size: 60MB
 
 #vip config
 vip:

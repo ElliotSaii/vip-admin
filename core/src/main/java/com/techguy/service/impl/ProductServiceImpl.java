@@ -85,13 +85,15 @@ public class ProductServiceImpl implements ProductService {
      return (List<Product>) productRepository.findAll();
     }
 
-    @Override
-    public List<Product> findByName(String name) {
-        return productRepository.findByNameContains(name);
-    }
+
 
     @Override
     public void delete(Long id) {
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<Product> searchByName(String name, Pageable page) {
+        return productRepository.findByNameIsContaining(name,page);
     }
 }

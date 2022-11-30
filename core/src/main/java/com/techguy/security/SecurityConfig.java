@@ -45,7 +45,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String APP_VERSION = "/api/app/version";
 
-    private static  final  String INDEX= "/api/app/index";
 
     private final  MemberServiceImpl memberService;
     private final   PasswordEncoder passwordEncoder;
@@ -64,7 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST,SIGN_UP,SIGN_IN,FORGOT_PW,SEND_MAIL)
                 .permitAll()
-                .antMatchers(HttpMethod.GET,CAPTCHA_CODE,HONOR_LIST,BANNER_IMAGE,GUIDE_LIST,SUB_GUIDE_LIST,APP_VERSION,INDEX)
+                .antMatchers(HttpMethod.GET,CAPTCHA_CODE,HONOR_LIST,BANNER_IMAGE,GUIDE_LIST,SUB_GUIDE_LIST,APP_VERSION)
                 .permitAll()
                 .antMatchers(ADMIN_SIGN_UP,ADMIN_SIGN_IN)
                 .permitAll()
@@ -91,6 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(daoAuthenticationProvider());
+
     }
 
 
@@ -99,6 +99,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder);
         provider.setUserDetailsService(memberService);
+
         return provider;
     }
 
