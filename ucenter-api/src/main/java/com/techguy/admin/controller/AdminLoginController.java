@@ -1,10 +1,12 @@
 package com.techguy.admin.controller;
 
 import com.techguy.constant.CommonConstant;
+import com.techguy.entity.LoginAttempt;
 import com.techguy.entity.admin.Admin;
 import com.techguy.jwt.JWTUtility;
 import com.techguy.response.MessageResult;
 import com.techguy.service.AdminService;
+import com.techguy.service.LoginAttemptService;
 import com.techguy.service.impl.AdminServiceImpl;
 import com.techguy.utils.ValidateUtil;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/admin/api")
@@ -25,9 +29,10 @@ public class AdminLoginController {
     private final AuthenticationManager authenticationManager;
     private final AdminServiceImpl adminServiceImpl;
     private final JWTUtility jwtUtility;
+    private final LoginAttemptService loginAttemptService;
 
     @PostMapping("/login")
-    public MessageResult<Admin> login(@RequestParam(value = "email")String email, @RequestParam(value = "password")String password) throws Exception {
+    public MessageResult<Admin> login(HttpServletRequest request, @RequestParam(value = "email")String email, @RequestParam(value = "password")String password) throws Exception {
         MessageResult<Admin> result = new MessageResult<>();
         boolean valid = ValidateUtil.validate(email);
         Admin admin = null;
@@ -51,19 +56,6 @@ public class AdminLoginController {
             return result;
 
         } else {
-            //generate token
-            // password must from db to be match with token user
-//            try {
-//                authenticationManager.authenticate(
-//                        new UsernamePasswordAuthenticationToken(
-//                                email,
-//                                password
-//                        )
-//                );
-//            } catch (BadCredentialsException e) {
-//                throw new Exception("INVALID_CREDENTIALS", e);
-//            }
-
             final UserDetails userDetails
                     = adminServiceImpl.loadUserByUsername(email);
 
@@ -72,6 +64,11 @@ public class AdminLoginController {
             admin.setToken(token);
 
             Admin sysAdmin = adminService.update(admin);
+
+            LoginAttempt loginAttempt = loginAttemptService.findByIpAddress(request.getRemoteAddr());
+            loginAttempt.setAttemptTime(-1);
+             loginAttemptService.update(loginAttempt);
+
             result.setSuccess(true);
             result.setCode(CommonConstant.OK_200);
             result.setMessage("Login success!");

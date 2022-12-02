@@ -30,20 +30,21 @@ import java.util.List;
 @EnableGlobalMethodSecurity(prePostEnabled  = true)
 @AllArgsConstructor
 
-
-
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private static final String SIGN_UP ="/api/member/register1",SIGN_IN="/api/member/login",CAPTCHA_CODE="/api/sys/randomImage/**",
-            FORGOT_PW="/api/sys/forgetpassword",SEND_MAIL="/api/sys/sendMail";
+//    private static final String SIGN_UP ="/api/member/register1",SIGN_IN="/api/member/login",CAPTCHA_CODE="/api/sys/randomImage/**",
+//            FORGOT_PW="/api/sys/forgetpassword",SEND_MAIL="/api/sys/sendMail";
 //    UPLOAD_IMG="/api/sys/upload";
 
-    private static final String ADMIN_SIGN_UP ="/admin/api/register",ADMIN_SIGN_IN="/admin/api/login";
+//    private static final String ADMIN_SIGN_UP ="/admin/api/register",ADMIN_SIGN_IN="/admin/api/login";
+//
+//    private static  final  String HONOR_LIST= "/api/honor/list",BANNER_IMAGE="/api/banner/list";
+//
+//    private static final String GUIDE_LIST= "/api/guide/list",SUB_GUIDE_LIST="/api/guide/sub/list";
+//
+//    private static final String APP_VERSION = "/api/app/version";
 
-    private static  final  String HONOR_LIST= "/api/honor/list",BANNER_IMAGE="/api/banner/list";
-
-    private static final String GUIDE_LIST= "/api/guide/list",SUB_GUIDE_LIST="/api/guide/sub/list";
-
-    private static final String APP_VERSION = "/api/app/version";
+    private static final String [] noFilterApi= new String[]{"/api/member/register1","/api/member/login","/api/sys/randomImage/**","/api/sys/forgetpassword","/api/sys/sendMail",
+    "/admin/api/register","/admin/api/login","/api/honor/list","/api/banner/list","/api/guide/list","/api/guide/sub/list","/api/app/version"};
 
 
     private final  MemberServiceImpl memberService;
@@ -51,7 +52,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final     JwtFilter jwtFilter;
 
 
-
+ /*.antMatchers("/admin/api").authenticated()
+                               .antMatchers("/**")
+                               .permitAll()*/
 
 
     @Override
@@ -61,15 +64,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST,SIGN_UP,SIGN_IN,FORGOT_PW,SEND_MAIL)
+                .antMatchers(noFilterApi)
                 .permitAll()
-                .antMatchers(HttpMethod.GET,CAPTCHA_CODE,HONOR_LIST,BANNER_IMAGE,GUIDE_LIST,SUB_GUIDE_LIST,APP_VERSION)
-                .permitAll()
-                .antMatchers(ADMIN_SIGN_UP,ADMIN_SIGN_IN)
-                .permitAll()
-                /*.antMatchers("/admin/api").authenticated()
-                               .antMatchers("/**")
-                               .permitAll()*/
                 .anyRequest()
                 .authenticated()
                 .and()

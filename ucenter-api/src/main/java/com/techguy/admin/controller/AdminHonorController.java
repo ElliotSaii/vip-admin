@@ -48,6 +48,27 @@ public class AdminHonorController {
 
     }
 
+    @PutMapping("/edit")
+    public MessageResult<?> edit (@RequestParam("id")Long id,@RequestParam("email")String email,@RequestParam("description")String description,
+                                @RequestParam(value = "imageUrl",required = false)String imageUrl) {
+
+      MessageResult<?> result=new MessageResult<>();
+      Honor honor=honorService.findById(id);
+      if(honor!=null){
+          honor.setEmail(email);
+          honor.setDescription(description);
+          honor.setImageUrl(imageUrl);
+
+          honorService.update(honor);
+          result.success("Operation success");
+          return result;
+      }else {
+          result.error500("OPERATION_FAIL");
+          return result;
+      }
+    }
+
+
     @GetMapping("/list")
     public MessageResult<?> list (@RequestParam("pageNo")Integer pageNo,@RequestParam("pageSize")Integer pageSize){
         MessageResult<?> result =new MessageResult<>();

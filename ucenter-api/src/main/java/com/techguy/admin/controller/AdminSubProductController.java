@@ -1,6 +1,7 @@
 package com.techguy.admin.controller;
 
 import com.techguy.admin.vo.SubProductVo;
+import com.techguy.entity.product.Product;
 import com.techguy.entity.product.SubProduct;
 import com.techguy.response.MessageResult;
 import com.techguy.service.ProductService;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,20 +62,40 @@ public class AdminSubProductController {
         SubProduct subProduct = subProductService.findBySubProductId(subId);
 
         if(subProduct!=null){
-             subProductService.delete(subId);
-             result.success("Deleted Success");
-             return result;
+            Long productId = subProduct.getProductId();
+            Product product = productService.findByProductId(productId);
+            if(product!=null){
+                BigDecimal totalUnitPrice = product.getTotalUnitPrice().subtract(subProduct.getUnitPrice());
+                product.setTotalUnitPrice(totalUnitPrice);
+                productService.update(product);
+
+                subProductService.delete(subId);
+                result.success("Deleted Success");
+                return result;
+            } else {
+                result.error500("Operation failed");
+                return result;
+            }
         }else {
             result.error500("Operation failed");
             return result;
         }
     }
     @PutMapping(value = "/update")
-    public MessageResult<SubProduct> addSubProduct(@RequestBody SubProductVo subProductVo){
+    public MessageResult<SubProduct> editSub(@RequestBody SubProductVo subProductVo){
         MessageResult<SubProduct> result =new MessageResult<>();
         SubProduct subProduct = subProductService.findBySubProductId(subProductVo.getId());
 
         if(subProduct!=null){
+
+            Product product = productService.findByProductId(subProduct.getProductId());
+
+            BigDecimal totalUnitPrice = product.getTotalUnitPrice().subtract(subProduct.getUnitPrice());
+
+            BigDecimal remainTotalUnitPrice = totalUnitPrice.add(subProductVo.getUnitPrice());
+            product.setTotalUnitPrice(remainTotalUnitPrice);
+            productService.update(product);
+
             subProduct.setUnitPrice(subProductVo.getUnitPrice());
             subProduct.setDescription(subProductVo.getDescription());
             subProduct.setName(subProductVo.getName());

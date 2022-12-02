@@ -12,4 +12,8 @@ public interface HonorService {
     Page<Honor> findAll(Pageable page);
 
     List<Honor> findAll();
+
+    Honor findById(Long id);
+
+    void update(Honor honor);
 }

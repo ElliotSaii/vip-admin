@@ -33,4 +33,24 @@ public class HonorServiceImpl implements HonorService {
     public List<Honor> findAll() {
         return (List<Honor>) honorRepository.findAll();
     }
+
+    @Override
+    public Honor findById(Long id) {
+        return honorRepository.findById(id).orElseThrow(()->new IllegalArgumentException(
+                String.format("Id %s not found",id)
+        ));
+    }
+
+    @Override
+    public void update(Honor honor) {
+      Honor honor1=  honorRepository.findById(honor.getId()).orElseThrow(()->new IllegalArgumentException(
+                String.format("Id %s not found",honor.getId())
+        ));
+
+      honor1.setImageUrl(honor.getImageUrl());
+      honor1.setDescription(honor.getDescription());
+      honor1.setEmail(honor.getEmail());
+
+      honorRepository.save(honor1);
+    }
 }
