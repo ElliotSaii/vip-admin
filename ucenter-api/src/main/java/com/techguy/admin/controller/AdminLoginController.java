@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/admin/api")
-@CrossOrigin(origins = {"http://154.39.248.73:8818","http://localhost:8080"})
+@CrossOrigin(origins = {"http://154.39.248.73:8818","http://localhost:3000"})
 @AllArgsConstructor
 public class AdminLoginController {
     private final AdminService adminService;

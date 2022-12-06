@@ -23,7 +23,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping(value = "/admin/api/product")
-@CrossOrigin(origins = {"http://154.39.248.73:8818","http://localhost:8080"})
+@CrossOrigin(origins = {"http://154.39.248.73:8818","http://localhost:3000"})
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 public class AdminProductController {
 

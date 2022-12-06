@@ -2,6 +2,7 @@ package com.techguy.admin.controller;
 
 import com.techguy.constant.CommonConstant;
 import com.techguy.constant.ErrorConstantMsg;
+import com.techguy.constant.SysConstant;
 import com.techguy.entity.Member;
 import com.techguy.entity.admin.Admin;
 import com.techguy.response.MessageResult;
@@ -20,8 +21,8 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("/admin/api")
-@CrossOrigin(origins = {"http://154.39.248.73:8818","http://localhost:8080"})
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@CrossOrigin(origins = {"http://154.39.248.73:8818","http://localhost:3000"})
+//@PreAuthorize("hasRole('ROLE_ADMIN')")
 @Slf4j
 @AllArgsConstructor
 public class AdminRegisterController {
@@ -39,8 +40,8 @@ public class AdminRegisterController {
 
         // check code
         code = code.toLowerCase();
-        String realKey = MD5Util.MD5Encode(code, "utf-8");
-        Object checkCode = redisTemplate.opsForValue().get(realKey);
+
+        Object checkCode = redisTemplate.opsForValue().get(SysConstant.EMAIL_BIND_CODE_PREFIX+email);
         //check code
         if (checkCode == null || checkCode.equals("") || !code.equals(checkCode)) {
             result.setMessage(ErrorConstantMsg.VERIFY_CODE_WRONG);
