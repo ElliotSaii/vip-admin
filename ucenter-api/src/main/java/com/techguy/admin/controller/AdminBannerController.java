@@ -5,6 +5,7 @@ import com.techguy.response.MessageResult;
 import com.techguy.service.BannerImageService;
 import com.techguy.vo.BannerVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/api/banner")
 @CrossOrigin(origins = {"http://154.39.248.73:8818","http://localhost:8080"})
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class AdminBannerController {
     private final BannerImageService bannerImageService;
 

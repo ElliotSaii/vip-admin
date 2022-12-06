@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.print.Book;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin/api")
 @CrossOrigin(origins = {"http://154.39.248.73:8818","http://localhost:8080"})
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class AdminMemberController {
     private final MemberService memberService;
 

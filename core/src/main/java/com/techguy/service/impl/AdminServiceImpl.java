@@ -4,6 +4,8 @@ import com.techguy.code.OnlyCodeUtils;
 import com.techguy.entity.Member;
 import com.techguy.entity.admin.Admin;
 import com.techguy.repository.AdminRepository;
+import com.techguy.role.Roles;
+import com.techguy.security.SecurityUserDetails;
 import com.techguy.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -38,6 +40,7 @@ public class AdminServiceImpl implements AdminService {
             saveAdmin.setPassword(encodePW);
             saveAdmin.setCreateTime(new Date());
             saveAdmin.setSecrectKey(sercetKey);
+            saveAdmin.setRoles(Roles.ADMIN);
             return adminRepository.save(saveAdmin);
     }
 
@@ -59,6 +62,6 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Admin admin = adminRepository.findByEmail(email);
-        return new User(admin.getEmail(),admin.getPassword(),new ArrayList<>());
+        return new SecurityUserDetails(admin.getId(),admin.getEmail(),admin.getPassword(),admin.getRoles());
     }
 }

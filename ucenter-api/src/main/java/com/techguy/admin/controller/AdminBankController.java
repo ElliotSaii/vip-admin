@@ -6,6 +6,7 @@ import com.techguy.entity.Bank;
 import com.techguy.response.MessageResult;
 import com.techguy.service.BankService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.DateFormat;
@@ -18,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/admin/api/bank")
 @CrossOrigin(origins = {"http://154.39.248.73:8818","http://localhost:8080"})
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class AdminBankController {
 
     private final BankService bankService;

@@ -1,5 +1,6 @@
 package com.techguy.security;
 import com.techguy.jwt.JwtFilter;
+import com.techguy.role.Roles;
 import com.techguy.service.impl.MemberServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -44,9 +45,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //    private static final String APP_VERSION = "/api/app/version";
 
     private static final String [] noFilterApi= new String[]{"/api/member/register1","/api/member/login","/api/sys/randomImage/**","/api/sys/forgetpassword","/api/sys/sendMail",
-    "/admin/api/register","/admin/api/login","/api/honor/list","/api/banner/list","/api/guide/list","/api/guide/sub/list","/api/app/version"};
-
-
+            "/admin/api/register","/admin/api/login","/api/honor/list","/api/banner/list","/api/guide/list","/api/guide/sub/list","/api/app/version",
+    };
+    
     private final  MemberServiceImpl memberService;
     private final   PasswordEncoder passwordEncoder;
     private final     JwtFilter jwtFilter;

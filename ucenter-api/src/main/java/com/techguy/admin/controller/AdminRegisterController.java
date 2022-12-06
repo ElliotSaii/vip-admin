@@ -12,6 +12,7 @@ import com.techguy.utils.ValidateUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,7 @@ import java.util.Date;
 @RestController
 @RequestMapping("/admin/api")
 @CrossOrigin(origins = {"http://154.39.248.73:8818","http://localhost:8080"})
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 @Slf4j
 @AllArgsConstructor
 public class AdminRegisterController {

@@ -1,6 +1,7 @@
 package com.techguy.entity.admin;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.techguy.role.Roles;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,6 +24,10 @@ public class Admin {
     private String password;
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
+
+    @Enumerated(EnumType.STRING)
+
+    private Roles roles;
 
     private String secrectKey;
 }

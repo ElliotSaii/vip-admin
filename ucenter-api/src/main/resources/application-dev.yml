@@ -2,7 +2,7 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     open-in-view: false
   datasource:
     url: jdbc:mysql://192.168.10.138:3306/zero-to-guru

@@ -1,6 +1,7 @@
 package com.techguy.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.techguy.role.Roles;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -51,6 +52,8 @@ public class Member implements Serializable {
 
 //    private Integer frozen;
 
+    @Enumerated(EnumType.STRING)
+    private Roles roles;
 
 
 

@@ -5,6 +5,8 @@ import com.techguy.entity.AppVersion;
 import com.techguy.response.MessageResult;
 import com.techguy.service.AppVersionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -13,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/api/app/version")
 @CrossOrigin(origins = {"http://154.39.248.73:8818","http://localhost:8080"})
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class AdminAppVersionController {
 
     private final AppVersionService appVersionService;
@@ -23,7 +26,10 @@ public class AdminAppVersionController {
     }
 
     @PostMapping("/add")
-    public MessageResult<?>add(@RequestBody AppVersionVo appVersionVo){
+    public MessageResult<?>add(@RequestBody AppVersionVo appVersionVo, Authentication authentication){
+
+        System.out.println(authentication.getAuthorities());
+
         MessageResult<?> result =new MessageResult<>();
         AppVersion appVersion =new AppVersion();
 

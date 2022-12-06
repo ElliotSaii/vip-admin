@@ -10,6 +10,7 @@ import com.techguy.service.LoginAttemptService;
 import com.techguy.service.impl.AdminServiceImpl;
 import com.techguy.utils.ValidateUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

@@ -3,6 +3,8 @@ package com.techguy.service.impl;
 import com.techguy.code.OnlyCodeUtils;
 import com.techguy.entity.Member;
 import com.techguy.repository.MemberRepository;
+import com.techguy.role.Roles;
+import com.techguy.security.SecurityUserDetails;
 import com.techguy.service.MemberService;
 import lombok.AllArgsConstructor;
 
@@ -37,6 +39,7 @@ public class MemberServiceImpl implements MemberService, Serializable {
                 mem.setPassword(password);
                 mem.setUpId(upId);
                 mem.setCreateTime(new Date());
+                mem.setRoles(Roles.USER);
                 saveMember = memberRepository.save(mem);
         }
         return saveMember;
@@ -119,7 +122,7 @@ public class MemberServiceImpl implements MemberService, Serializable {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Member member = memberRepository.findByEmail(email);
-        return new User(member.getEmail(),member.getPassword(),new ArrayList<>());
+        return new SecurityUserDetails(member.getId(),member.getEmail(),member.getPassword(),member.getRoles());
     }
 
 }

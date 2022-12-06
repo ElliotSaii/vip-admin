@@ -63,7 +63,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = null;
         String userName = null;
-        if(null != authorization) {
+        if(null != authorization && !authorization.isEmpty()) {
             token = authorization.replace("Bearer ","");
             try {
                 userName = jwtUtility.getUsernameFromToken(token);
@@ -113,7 +113,7 @@ public class JwtFilter extends OncePerRequestFilter {
                                }
                             else {
                                 httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-
+                                return;
                             }
                         }
                 }
