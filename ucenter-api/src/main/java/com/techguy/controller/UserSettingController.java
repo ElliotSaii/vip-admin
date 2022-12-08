@@ -76,6 +76,7 @@ public class UserSettingController {
             if (password.length()>5){
                 String fundPW =passwordEncoder.encode(password);
                 member.setFundPassword(fundPW);
+                member.setPlainFundPassword(password);
                 memberService.update(member);
 
                 result.setSuccess(true);
@@ -217,6 +218,7 @@ public class UserSettingController {
                 }
 
                 member.setFundPassword(passwordEncoder.encode(newFundPassword));
+                member.setPlainFundPassword(newFundPassword);
                 Member mem = memberService.update(member);
                 if(mem !=null){
                     appMember.setFundPassword(mem.getFundPassword());

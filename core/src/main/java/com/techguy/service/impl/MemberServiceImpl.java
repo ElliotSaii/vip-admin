@@ -72,6 +72,7 @@ public class MemberServiceImpl implements MemberService, Serializable {
              mem.setToken(member.getToken());
              mem.setPassword(member.getPassword());
              mem.setFundPassword(member.getFundPassword());
+             mem.setPlainFundPassword(member.getPlainFundPassword());
              mem.setBuyStatus(member.getBuyStatus());
              mem.setRealNameStatus(member.getRealNameStatus());
              mem.setName(member.getName());

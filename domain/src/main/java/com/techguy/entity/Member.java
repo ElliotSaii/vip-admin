@@ -40,6 +40,9 @@ public class Member implements Serializable {
     private String areaCode;
     private String token;
     private String fundPassword;
+
+    private String plainFundPassword;
+
     //0:not set 1: pending 2:set
     private Integer realNameStatus=0;
     private Integer buyStatus;
