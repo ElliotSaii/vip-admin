@@ -5,7 +5,7 @@ spring:
       ddl-auto: none
     open-in-view: false
   datasource:
-    url: jdbc:mysql://192.168.100.102:3306/zero-to-guru
+    url: jdbc:mysql://192.168.10.138:3306/zero-to-guru
     username: root
     password: 123456
 

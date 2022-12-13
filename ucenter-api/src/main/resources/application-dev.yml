@@ -5,7 +5,7 @@ spring:
       ddl-auto: update
     open-in-view: false
   datasource:
-    url: jdbc:mysql://192.168.100.102:3306/zero-to-guru
+    url: jdbc:mysql://192.168.10.138:3306/zero-to-guru
     username: root
     password: 123456
 
@@ -34,25 +34,6 @@ spring:
             enable: true
           timeout: 8000
 
-#  mail:
-#    host: smtp.gmail.com
-#    username: elliotsaii1@gmail.com
-#    password: inrfbjqwjrdzuakv
-#    port: 465
-#    protocol: smtps
-#    smtp:
-#      proxy:
-#        host: 192.168.10.199
-#        port: 7890
-#    properties:
-#      mail:
-#        transport:
-#          protocol: smtps
-#        smtps:
-#          starttls:
-#            enable: true
-#          timeout: 8000
-
   # redis
   redis:
     database: 0
@@ -71,6 +52,7 @@ spring:
     multipart:
       max-request-size: 60MB
       max-file-size: 60MB
+
 
 #vip config
 vip:

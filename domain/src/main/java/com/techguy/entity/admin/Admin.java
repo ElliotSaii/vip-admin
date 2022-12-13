@@ -26,7 +26,6 @@ public class Admin {
     private Date createTime;
 
     @Enumerated(EnumType.STRING)
-
     private Roles roles;
 
     private String secrectKey;
