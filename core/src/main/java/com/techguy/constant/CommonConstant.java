@@ -11,4 +11,5 @@ public interface CommonConstant {
  String ACCOUNT_NOT_FOUND ="account not found" ;
     Integer TOKEN_EXPIRED = 403;
 
+    String LOGIN_ATTEMPT = "login attempt";
 }

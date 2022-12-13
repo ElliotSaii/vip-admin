@@ -59,7 +59,6 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
         String authorization = httpServletRequest.getHeader("Authorization");
         String admin = httpServletRequest.getHeader("Admin");
-//        String memberId = httpServletRequest.getHeader("memberId");
 
         String token = null;
         String userName = null;
@@ -89,13 +88,6 @@ public class JwtFilter extends OncePerRequestFilter {
                          }
                         }
                         else {
-/*                            Member member = new Member();
-                            if(!Objects.equals(memberId,null)){
-                                member= userService.findByMemberId(Long.parseLong(memberId));
-                            }
-                            Member user = userService.findByEmail(userName);
-
-                            if(token.equals(member.getToken()) && user.getToken().equals(member.getToken())){*/
                             Member user = userService.findByEmail(userName);
                                if(token.equals(user.getToken())) {
                                    UserDetails userDetails

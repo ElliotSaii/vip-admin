@@ -1,6 +1,7 @@
 package com.techguy.aspect;
 
 import com.techguy.config.LocaleMessageSourceService;
+import com.techguy.constant.CommonConstant;
 import com.techguy.constant.SysConstant;
 import com.techguy.entity.LoginAttempt;
 import com.techguy.service.LoginAttemptService;
@@ -83,7 +84,9 @@ public class AntiAttackAspect {
         log.info("ip : {} ",ipAddress);
 
         if( attempt.getAttemptTime()>=5){
+            String realKey = SysConstant.ANTI_ATTACK_+ CommonConstant.LOGIN_ATTEMPT;
             valueOperations.set(key,"Frequently Request" , 10, TimeUnit.MINUTES);
+            valueOperations.set(realKey,"Login Attempt",3,TimeUnit.MINUTES);
         }
         attempt.setAttemptTime(attempt.getAttemptTime()+1);
         loginAttemptService.update(attempt);
