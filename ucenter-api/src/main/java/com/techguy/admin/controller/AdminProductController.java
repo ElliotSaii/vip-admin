@@ -129,7 +129,7 @@ public class AdminProductController {
     public MessageResult<?> list (@RequestParam("pageNo")Integer pageNo,@RequestParam("pageSize")Integer pageSize,@RequestParam(value = "name",required = false)String name){
 
         MessageResult<?> result = new MessageResult<>();
-        Pageable page = PageRequest.of(pageNo - 1,pageSize, Sort.by("createTime").descending());
+        Pageable page = PageRequest.of(pageNo - 1,pageSize, Sort.by("endTime").descending());
 
         Page<Product> productPage=null;
         if(name!=null && !name.isEmpty()){

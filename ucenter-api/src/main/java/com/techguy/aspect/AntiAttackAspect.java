@@ -79,9 +79,9 @@ public class AntiAttackAspect {
         ValueOperations valueOperations = redisTemplate.opsForValue();
 
         String ipAddress = request.getRemoteAddr();
-        LoginAttempt attempt= loginAttemptService.findByIpAddress(ipAddress);
-
         log.info("ip : {} ",ipAddress);
+
+        LoginAttempt attempt= loginAttemptService.findByIpAddress(ipAddress);
 
         if( attempt.getAttemptTime()>=5){
             String realKey = SysConstant.ANTI_ATTACK_+ CommonConstant.LOGIN_ATTEMPT;

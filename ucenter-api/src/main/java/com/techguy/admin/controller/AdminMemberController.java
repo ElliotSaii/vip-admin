@@ -3,6 +3,7 @@ package com.techguy.admin.controller;
 import com.techguy.entity.Member;
 import com.techguy.response.MessageResult;
 import com.techguy.service.MemberService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,7 @@ import java.util.Map;
 @RequestMapping("/admin/api")
 @CrossOrigin(origins = {"http://154.39.248.73:8818","http://localhost:3000"})
 @PreAuthorize("hasRole('ROLE_ADMIN')")
+@Slf4j
 public class AdminMemberController {
     private final MemberService memberService;
 
@@ -78,12 +80,27 @@ public class AdminMemberController {
         return result;
     }
 
+    @PutMapping("/editMember")
+    public MessageResult<?> editMember(@RequestParam("memberId")Long memberId,@RequestParam("cnyBalance")String cnyBalance){
+        MessageResult<?>result =new MessageResult<>();
+        Member member = memberService.findByMemberId(memberId);
+        if(member==null){
+            result.error500("Operation Failed");
+            return result;
+        }
+        log.trace("edit {}  original cny {} to => {}",member.getEmail(),member.getCnyBalance(),cnyBalance);
+        member.setCnyBalance(cnyBalance);
+        memberService.update(member);
+        result.success("Operation Success");
+        return result;
+    }
+
     @GetMapping("/list")
     public MessageResult<?> list(@RequestParam("pageNo")Integer pageNo,@RequestParam("pageSize")Integer pageSize,@RequestParam("name")String name){
         MessageResult<?> result=new MessageResult<>();
         Map<String,Object>map =new HashMap<>();
         pageNo=pageNo-1;
-        Pageable page =PageRequest.of(pageNo,pageSize,Sort.by("cnyBalance").descending());
+        Pageable page =PageRequest.of(pageNo,pageSize);
         Page<Member> memberPage=null;
 
         if(name!=null && !name.isEmpty()){

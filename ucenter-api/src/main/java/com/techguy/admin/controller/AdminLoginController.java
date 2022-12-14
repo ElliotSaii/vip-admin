@@ -10,6 +10,7 @@ import com.techguy.service.LoginAttemptService;
 import com.techguy.service.impl.AdminServiceImpl;
 import com.techguy.utils.ValidateUtil;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/admin/api")
 @CrossOrigin(origins = {"http://154.39.248.73:8818","http://localhost:3000"})
 @AllArgsConstructor
+@Slf4j
 public class AdminLoginController {
     private final AdminService adminService;
     private final PasswordEncoder passwordEncoder;
@@ -65,10 +67,19 @@ public class AdminLoginController {
             admin.setToken(token);
 
             Admin sysAdmin = adminService.update(admin);
+            String ip = request.getRemoteAddr();
 
-            LoginAttempt loginAttempt = loginAttemptService.findByIpAddress(request.getRemoteAddr());
-            loginAttempt.setAttemptTime(-1);
-             loginAttemptService.update(loginAttempt);
+            log.info("Admin request login ip {}",ip);
+
+            LoginAttempt loginAttempt = loginAttemptService.findByIpAddress(ip);
+             if(loginAttempt==null){
+                 result.error500("Undefined ip "+ip);
+                 return result;
+             }
+             else {
+                 loginAttempt.setAttemptTime(-1);
+                 loginAttemptService.update(loginAttempt);
+             }
 
             result.setSuccess(true);
             result.setCode(CommonConstant.OK_200);
