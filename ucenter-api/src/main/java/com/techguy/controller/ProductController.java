@@ -142,7 +142,7 @@ public class ProductController {
     public MessageResult<?> join(){
         MessageResult<?> result = new MessageResult<>();
         List<Bank> bankList = bankService.getBankList();
-        //get available bank with version 3
+        // bank  version 2 =>available 3=>unavailable
       if(bankList.size()>0) {
           for (Bank bank : bankList) {
               if (bank.getBanKVersion() == 2) {

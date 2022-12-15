@@ -1,5 +1,6 @@
 package com.techguy.controller;
 
+import com.techguy.config.LocaleMessageSourceService;
 import com.techguy.constant.CommonConstant;
 import com.techguy.entity.Member;
 import com.techguy.jwt.JWTUtility;
@@ -25,6 +26,7 @@ public class LoginController {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final MemberServiceImpl memberServiceImpl;
+    private final LocaleMessageSourceService messageSourceService;
     private final JWTUtility jwtUtility;
 
     @PostMapping("/login")
@@ -37,7 +39,7 @@ public class LoginController {
         }
         if (member == null) {
             result.setSuccess(false);
-            result.setMessage("Email has not register yet!");
+            result.setMessage(messageSourceService.getMessage("MAIL_NOT_REGISTER"));
             result.setResult(null);
             return result;
         }
@@ -46,7 +48,7 @@ public class LoginController {
         if (!passwordEncoder.matches(password,member.getPassword())) {
             result.setSuccess(false);
             result.setCode(CommonConstant.INTERNAL_SERVER_ERROR_500);
-            result.setMessage("Something wrong!");
+            result.setMessage(messageSourceService.getMessage("PWD_NOT_CORRECT"));
             result.setResult(null);
             return result;
 
@@ -81,14 +83,14 @@ public class LoginController {
             Member appMember = memberService.update(member);
             if (appMember == null) {
                 result.setSuccess(false);
-                result.setMessage("Login failed");
+                result.setMessage(messageSourceService.getMessage("OPERATION_FAIL"));
                 result.setResult(null);
                 result.setCode(CommonConstant.INTERNAL_SERVER_ERROR_500);
                 return result;
             }
             result.setSuccess(true);
             result.setCode(CommonConstant.OK_200);
-            result.setMessage("Login success!");
+            result.setMessage(messageSourceService.getMessage("LOGIN_SUCCESS"));
             result.setResult(appMember);
 
             return result;

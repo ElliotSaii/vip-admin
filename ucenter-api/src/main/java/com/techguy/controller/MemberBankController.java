@@ -122,7 +122,7 @@ public class MemberBankController {
         MemberBank memberBank =  memberBankService.findByBankId(bankId);
        if(memberBank!=null){
            memberBankService.deleteById(bankId);
-           result.success("Deleted bank");
+           result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
            return result;
        }
        return result;
@@ -135,7 +135,7 @@ public class MemberBankController {
        List<MemberBank> memberBankList= memberBankService.findAllByMemberId(memberId);
 
        if(memberBankList.size()>0){
-           result.success("Member Banks List");
+           result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
            result.setResult(memberBankList);
            return result;
        }else {
