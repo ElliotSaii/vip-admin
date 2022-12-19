@@ -20,7 +20,7 @@ public class EmailService {
     private final JavaMailSender emailSender;
     private final SpringTemplateEngine springTemplateEngine;
 
-
+    @Async
     public void sendMail(Email email) throws MessagingException {
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message,MimeMessageHelper.MULTIPART_MODE_RELATED, StandardCharsets.UTF_8.name());
