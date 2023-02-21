@@ -34,6 +34,7 @@ public class MemberServiceImpl implements MemberService, Serializable {
         String uuid = OnlyCodeUtils.creatUUID();
         if(member==null){
                 Member mem = new Member();
+                mem.setCnyBalance("0");
                 mem.setInvCode(uuid);
                 mem.setEmail(reqEmail);
                 mem.setPassword(password);
@@ -117,6 +118,11 @@ public class MemberServiceImpl implements MemberService, Serializable {
     @Override
     public Page<Member> searchName(String name, Pageable page) {
         return memberRepository.findByUsernameIsContaining(name,page);
+    }
+
+    @Override
+    public Page<Member> findRealNameRequest(Integer status, Pageable page) {
+        return memberRepository.findAllByRealNameStatusEquals(status,page);
     }
 
 

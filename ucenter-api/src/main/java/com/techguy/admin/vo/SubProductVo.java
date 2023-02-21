@@ -14,6 +14,7 @@ public class SubProductVo {
 
     private Long id;
     private Long productId;
+    private String productName;
     private String name;
     private Integer buyStatus;
     private BigDecimal unitPrice;

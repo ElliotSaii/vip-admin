@@ -43,7 +43,8 @@ public class AdminOrderController {
         Member member = memberService.findByMemberId(memberId);
         ProductRecord productRecord = productRecordService.findById(productRecordId);
 
-        if (productRecord == null || member==null || Objects.equals(productRecord.getBuyStatus(), status) ) {
+
+        if (productRecord == null || member==null || Objects.equals(productRecord.getBuyStatus(), status)) {
             result.error500("Operation failed");
             return result;
         }

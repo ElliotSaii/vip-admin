@@ -17,8 +17,9 @@ public class MemberBankServiceImpl implements MemberBankService {
         this.memberBankRepository=memberBankRepository;
     }
     @Override
-    public void save(MemberBank memberBank) {
-        memberBankRepository.save(memberBank);
+    public MemberBank save(MemberBank memberBank) {
+        return memberBankRepository.save(memberBank);
+
     }
 
     @Override

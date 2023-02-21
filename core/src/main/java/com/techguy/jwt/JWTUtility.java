@@ -20,7 +20,7 @@ public class JWTUtility implements Serializable {
 
     private static final long serialVersionUID = 234234523523L;
     //1 week
-    public static final long JWT_TOKEN_VALIDITY = 3 * 24 * 60 * 60;
+    public static final long JWT_TOKEN_VALIDITY = 15 * 24 * 60 * 60;
 //  public static final long JWT_TOKEN_VALIDITY = 2 * 60;
     public HandlerExceptionResolver handlerExceptionResolver;
 

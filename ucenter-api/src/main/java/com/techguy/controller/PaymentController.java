@@ -9,6 +9,7 @@ import com.techguy.entity.product.Product;
 import com.techguy.entity.product.ProductRecord;
 import com.techguy.response.MessageResult;
 import com.techguy.service.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +23,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/payment")
-
+@Slf4j
 public class PaymentController {
     private final MemberService memberService;
     private final BankService bankService;
@@ -83,6 +84,9 @@ public class PaymentController {
                     payment.setTotalUnitPrice(product.getTotalUnitPrice());
                     payment.setVoucher(voucher);
                     Payment savePayment = paymentService.save(payment);
+
+                    log.info("Retry->Member id: {},main product id{},payment id:{}, success",memberId,productId,savePayment.getId());
+
                     result.success(messageSourceService.getMessage("PAID_SUCCESS"));
                     result.setResult(savePayment);
                 } else {
@@ -113,6 +117,8 @@ public class PaymentController {
                 payment.setTotalUnitPrice(product.getTotalUnitPrice());
                 payment.setVoucher(voucher);
                 Payment savePayment = paymentService.save(payment);
+
+                log.info("New->Member id: {},main product id{},payment id:{}, success",memberId,productId,savePayment.getId());
                 result.success(messageSourceService.getMessage("PAID_SUCCESS"));
                 result.setResult(savePayment);
                 return result;

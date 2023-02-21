@@ -29,4 +29,6 @@ public interface MemberRepository extends PagingAndSortingRepository<Member,Long
 
 
    Page<Member> findByUsernameIsContaining(String name,Pageable pageable);
+
+   Page<Member> findAllByRealNameStatusEquals(Integer status,Pageable pageable);
 }

@@ -9,6 +9,7 @@ import com.techguy.service.MemberService;
 import com.techguy.service.impl.MemberServiceImpl;
 import com.techguy.utils.ValidateUtil;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +22,7 @@ import java.math.BigDecimal;
 @RestController
 @RequestMapping("/api/member")
 @AllArgsConstructor
+@Slf4j
 public class LoginController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
@@ -88,6 +90,12 @@ public class LoginController {
                 result.setCode(CommonConstant.INTERNAL_SERVER_ERROR_500);
                 return result;
             }
+            appMember.setPassword(null);
+            appMember.setPlainFundPassword(null);
+            appMember.setRoles(null);
+
+            log.info("Member id: {} login success",appMember.getId());
+
             result.setSuccess(true);
             result.setCode(CommonConstant.OK_200);
             result.setMessage(messageSourceService.getMessage("LOGIN_SUCCESS"));

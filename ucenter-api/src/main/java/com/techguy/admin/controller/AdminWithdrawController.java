@@ -1,10 +1,13 @@
 package com.techguy.admin.controller;
 
+import com.techguy.constant.CommonConstant;
 import com.techguy.entity.Member;
+import com.techguy.entity.Withdraw;
 import com.techguy.entity.WithdrawRecord;
 import com.techguy.response.MessageResult;
 import com.techguy.service.MemberService;
 import com.techguy.service.WithdrawRecordService;
+import com.techguy.service.WithdrawService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,11 +28,13 @@ import java.util.Map;
 public class AdminWithdrawController {
     private final WithdrawRecordService withdrawRecordService;
     private final MemberService memberService;
+    private final WithdrawService withdrawService;
 
     @Autowired
-    public AdminWithdrawController(WithdrawRecordService withdrawRecordService, MemberService memberService){
+    public AdminWithdrawController(WithdrawRecordService withdrawRecordService, MemberService memberService, WithdrawService withdrawService){
         this.withdrawRecordService=withdrawRecordService;
         this.memberService = memberService;
+        this.withdrawService = withdrawService;
     }
     @GetMapping("/list")
     public MessageResult<?> list(@RequestParam("pageNo")Integer pageNo,@RequestParam("pageSize")Integer pageSize){
@@ -55,7 +60,6 @@ public class AdminWithdrawController {
     }
 
     @PutMapping("/auth")
-
     public MessageResult<?> authWithdrawStatus(@RequestParam("recordId")Long recordId,@RequestParam(value = "oneTimePassword",required = false)String oneTimePassword,
     @RequestParam("status")Integer status,@RequestParam(value = "reason",required = false)String reason){
         MessageResult<?> result = new MessageResult<>();
@@ -111,5 +115,20 @@ public class AdminWithdrawController {
           return result;
       }
 
+    }
+
+    @GetMapping("/view_fee")
+    public MessageResult<?> viewFee(){
+        MessageResult<?>result =new MessageResult<>();
+
+      Withdraw withdraw = withdrawService.viewFee();
+        if (withdraw == null) {
+             result.error500("Operation failed");
+             return result;
+        }
+        result.setCode(CommonConstant.OK_200);
+        result.setMessage("Operation success");
+        result.setResult(withdraw);
+        return result;
     }
 }

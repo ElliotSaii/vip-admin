@@ -29,4 +29,6 @@ public interface MemberService extends UserDetailsService {
 
 
     Page<Member> searchName(String name, Pageable page);
+
+    Page<Member> findRealNameRequest(Integer status, Pageable page);
 }

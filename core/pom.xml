@@ -14,8 +14,10 @@
 
 
     <properties>
-               <maven.compiler.source>8</maven.compiler.source>
-               <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+<!--        <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>-->
+<!--        <org.maven.version>3.8.1</org.maven.version>-->
     </properties>
 
     <dependencies>
@@ -24,8 +26,49 @@
             <artifactId>domain</artifactId>
             <version>1.0.0</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.mapstruct</groupId>-->
+<!--            <artifactId>mapstruct</artifactId>-->
+<!--            <version>${org.mapstruct.version}</version>-->
+<!--        </dependency>-->
     </dependencies>
 
 
+<!--    <build>-->
+<!--        <plugins>-->
+<!--        <plugin>-->
+<!--            <groupId>org.apache.maven.plugins</groupId>-->
+<!--            <artifactId>maven-compiler-plugin</artifactId>-->
+<!--            <version>${org.maven.version}</version>-->
+<!--            <configuration>-->
+<!--                <source>1.8</source>-->
+<!--                <target>1.8</target>-->
+<!--                <annotationProcessorPaths>-->
+<!--                    <path>-->
+<!--                        <groupId>org.projectlombok</groupId>-->
+<!--                        <artifactId>lombok</artifactId>-->
+<!--                        <version>1.18.4</version>-->
+<!--                    </path>-->
+<!--                    <path>-->
+<!--                        <groupId>org.mapstruct</groupId>-->
+<!--                        <artifactId>mapstruct-processor</artifactId>-->
+<!--                        <version>${org.mapstruct.version}</version>-->
+<!--                    </path>-->
+
+<!--                    <dependency>-->
+<!--                        <groupId>org.projectlombok</groupId>-->
+<!--                        <artifactId>lombok-mapstruct-binding</artifactId>-->
+<!--                        <version>0.2.0</version>-->
+<!--                    </dependency>-->
+<!--                </annotationProcessorPaths>-->
+<!--                <compilerArgs>-->
+<!--                    <compilerArg>-->
+<!--                        -Amapstruct.defaultComponentModel=spring-->
+<!--                    </compilerArg>-->
+<!--                </compilerArgs>-->
+<!--            </configuration>-->
+<!--        </plugin>-->
+<!--        </plugins>-->
+<!--    </build>-->
 
 </project>

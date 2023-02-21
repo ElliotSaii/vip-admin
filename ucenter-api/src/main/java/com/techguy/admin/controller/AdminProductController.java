@@ -71,6 +71,7 @@ public class AdminProductController {
         SubProduct subProduct = new SubProduct();
 
         subProduct.setProductId(subProductVo.getProductId());
+        subProduct.setProductName(subProductVo.getProductName());
         subProduct.setBuyStatus(0);
         subProduct.setName(subProductVo.getName());
         subProduct.setUnitPrice(subProductVo.getUnitPrice());
@@ -78,6 +79,7 @@ public class AdminProductController {
         subProduct.setFromImgUrl(subProductVo.getFromImgUrl());
         subProduct.setDescription(subProductVo.getDescription());
         subProduct.setCreateTime(new Date());
+
 
         Product product = productService.findByProductId(subProductVo.getProductId());
         BigDecimal totalUnitPrice = product.getTotalUnitPrice();

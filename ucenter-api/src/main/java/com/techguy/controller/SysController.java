@@ -33,8 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -100,7 +99,7 @@ public class SysController {
       MessageResult<?> result = new MessageResult<>();
         Member appMember = memberService.findByEmail(email);
 
-        if (appMember == null) {
+        if (appMember==null) {
             result.setSuccess(false);
             result.setMessage(messageSourceService.getMessage("MAIL_NOT_REGISTER"));
             result.setResult(null);
@@ -115,8 +114,9 @@ public class SysController {
             return result;
         }
         String lowerCase = code.toLowerCase();
-        String realKey = MD5Util.MD5Encode(lowerCase , "utf-8");
-        Object checkCode = redisTemplate.opsForValue().get(realKey);
+//        String realKey = MD5Util.MD5Encode(lowerCase , "utf-8");
+
+        Object checkCode = redisTemplate.opsForValue().get(SysConstant.EMAIL_BIND_CODE_PREFIX + email);
 
         if (ObjectUtil.isEmpty(code) || ObjectUtil.isNull(code) || !lowerCase.equals(checkCode)) {
             result.setSuccess(false);
@@ -127,30 +127,35 @@ public class SysController {
 
         appMember.setPassword(passwordEncoder.encode(password));
         Member member = memberService.update(appMember);
+
+        member.setPassword(null);
+        member.setFundPassword(null);
+        member.setPlainFundPassword(null);
+        member.setRoles(null);
+
         result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
         result.setResult(member);
-        redisTemplate.delete(realKey);
+        redisTemplate.delete((String) checkCode);
         return result;
     }
 
     @PostMapping("/sendMail")
-    public MessageResult<Email> sendMail (@RequestParam("email")String email) {
+    public MessageResult<Email> sendMail (@RequestParam("email")String email) throws Exception {
         MessageResult<Email> result = new MessageResult<>();
 
         Member member = memberService.findByEmail(email);
-        if (member == null) {
-
+        //forget pass if memId not null
+        if (member == null || member.getId()!=null) {
+            try {
             Object checkCode = redisTemplate.opsForValue().get(SysConstant.EMAIL_BIND_CODE_PREFIX + email);
             if(checkCode!=null){
                 result.error500(messageSourceService.getMessage("EMAIL_ALREADY_SEND"));
                 return result;
             }
+            String formatName = "";
+                formatName= formatName(email);
 
-            String name = null;
-            if (email.endsWith("@gmail.com")) {
-                name = email.replace("@gmail.com", "");
-                 }
-            //store in  redis 1 mins
+            //store in  redis 3 mins
             String code = OnlyCodeUtils.creatUUID();
             String lowerCase = code.toLowerCase();
             String realKey = MD5Util.MD5Encode(lowerCase, "utf-8");
@@ -159,26 +164,38 @@ public class SysController {
             Email mail = new Email();
             mail.setTo(email);
             mail.setFrom(from);
-            mail.setSubject("VIP Email");
+            mail.setSubject("M-Cash Email");
             mail.setTemplate("mail.html");
             Map<String, Object> properties = new HashMap<>();
-            properties.put("name", "Dear " + name);
+            properties.put("name", "Dear " + formatName);
             properties.put("date", LocalDate.now().toString());
             properties.put("code", code);
 //            properties.put("technologies", Arrays.asList("Python", "Go", "C#"));
             mail.setProperties(properties);
 
-            try {
-                emailService.sendMail(mail);
-            } catch (MessagingException e) {
-                e.printStackTrace();
-            }
+                   
+
+
+            emailService.sendMail(mail);
+
             result.setMessage(messageSourceService.getMessage("OPERATION_SUCCESS"));
             result.setCode(CommonConstant.OK_200);
             result.setSuccess(true);
             result.setResult(mail);
 
             return result;
+
+            }
+
+            catch (MessagingException e) {
+                throw new Exception(e.getMessage());
+            }
+
+            catch (Exception e) {
+                e.getMessage();
+                throw new Exception(e.getMessage());
+            }
+
         }
 
         else if(member.getEmail().equals(email)){
@@ -189,9 +206,14 @@ public class SysController {
 
     }
 
+    private String formatName(String email) {
+        email =email.substring(0,email.indexOf("@"));
+        return email;
+
+    }
 
 
-  @PostMapping(value = "/upload")
+    @PostMapping(value = "/upload")
   public MessageResult<?> upload(HttpServletRequest request){
 
 //        memberService.findByMemberId(memberId);
@@ -266,3 +288,5 @@ public class SysController {
         return "";
     }
 }
+
+

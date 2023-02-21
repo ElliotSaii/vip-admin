@@ -5,6 +5,7 @@ import com.techguy.config.LocaleMessageSourceService;
 import com.techguy.constant.CommonConstant;
 import com.techguy.constant.ErrorConstantMsg;
 import com.techguy.constant.SysConstant;
+import com.techguy.dto.MemberDTO;
 import com.techguy.utils.MD5Util;
 import com.techguy.vo.RegisterVo;
 import com.techguy.entity.Member;
@@ -29,6 +30,7 @@ public class RegisterController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final LocaleMessageSourceService messageSourceService;
+//    private final MemberMapper memberMapper;
 
     @PostMapping(value = "/register1")
     public MessageResult<Member> register(@RequestParam(value = "email")String email,@RequestParam(value = "code")String code,@RequestParam(value = "password")String password,@RequestParam(value = "invCode",required = false)String upId){
@@ -83,11 +85,16 @@ public class RegisterController {
                 String encodePW = passwordEncoder.encode(password);
                 Member mem = memberService.register(newMember, encodePW, email, upId);
                 if (mem != null) {
-                    redisTemplate.delete(checkCode);
 
+                    mem.setPassword(null);
+                    mem.setFundPassword(null);
+                    mem.setPlainFundPassword(null);
+                    mem.setRoles(null);
+
+                    redisTemplate.delete(checkCode);
                     result.success(messageSourceService.getMessage("REGISTER_SUCCESS"));
                     result.setResult(mem);
-                    log.info("Member Register {}", mem.getEmail());
+                    log.info("New member registered id:{}", mem.getId());
                     return result;
                 }
             }

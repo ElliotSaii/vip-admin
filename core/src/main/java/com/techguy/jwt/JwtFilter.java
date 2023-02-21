@@ -1,5 +1,6 @@
 package com.techguy.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.techguy.constant.CommonConstant;
 import com.techguy.entity.Member;
 import com.techguy.entity.admin.Admin;
@@ -47,6 +48,9 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private PasswordEncoder  encoder;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private static final String  secrectkey= "ima34rw3r3wrsdfsefesfd324324324*&^$%w#";
     private static final String adminKey="kzieksikeiskkeiskeiksieiskeisiekiskeksie";
 
@@ -67,9 +71,9 @@ public class JwtFilter extends OncePerRequestFilter {
             try {
                 userName = jwtUtility.getUsernameFromToken(token);
                 if(null != userName && SecurityContextHolder.getContext().getAuthentication() == null) {
-                        if(admin!=null && admin.equals(adminKey)){
-                            Admin sysAdmin = adminService.findByEmail(userName);
-                            if(encoder.matches(secrectkey,sysAdmin.getSecrectKey())){
+                    if(admin!=null && admin.equals(adminKey)){
+                        Admin sysAdmin = adminService.findByEmail(userName);
+                        if(encoder.matches(secrectkey,sysAdmin.getSecrectKey())){
 
                             UserDetails userDetails
                                     = adminService.loadUserByUsername(userName);
@@ -84,30 +88,30 @@ public class JwtFilter extends OncePerRequestFilter {
                                 );
 
                                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-                             }
-                         }
-                        }
-                        else {
-                            Member user = userService.findByEmail(userName);
-                               if(token.equals(user.getToken())) {
-                                   UserDetails userDetails
-                                           = userService.loadUserByUsername(userName);
-                                   if (jwtUtility.validateToken(token, userDetails)) {
-                                       UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
-                                               = new UsernamePasswordAuthenticationToken(userDetails,
-                                               null, userDetails.getAuthorities());
-
-                                       usernamePasswordAuthenticationToken.setDetails(
-                                               new WebAuthenticationDetailsSource().buildDetails(httpServletRequest)
-                                       );
-                                       SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-                                   }
-                               }
-                            else {
-                                httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                                return;
                             }
                         }
+                    }
+                    else {
+                        Member user = userService.findByEmail(userName);
+                        if(token.equals(user.getToken())) {
+                            UserDetails userDetails
+                                    = userService.loadUserByUsername(userName);
+                            if (jwtUtility.validateToken(token, userDetails)) {
+                                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
+                                        = new UsernamePasswordAuthenticationToken(userDetails,
+                                        null, userDetails.getAuthorities());
+
+                                usernamePasswordAuthenticationToken.setDetails(
+                                        new WebAuthenticationDetailsSource().buildDetails(httpServletRequest)
+                                );
+                                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                            }
+                        }
+                        else {
+                            httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            return;
+                        }
+                    }
                 }
             } catch (JwtException e){
                 httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);

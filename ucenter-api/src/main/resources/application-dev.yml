@@ -5,9 +5,9 @@ spring:
       ddl-auto: update
     open-in-view: false
   datasource:
-    url: jdbc:mysql://192.168.10.138:3306/zero-to-guru
+    url: jdbc:mysql://localhost:3306/zero-to-guru
     username: root
-    password: 123456
+    password: root
 
     #cache
     hikari:
@@ -23,6 +23,7 @@ spring:
         cacheServerConfiguration: true
         elideSetAutoCommits: true
         maintainTimeStats: false
+      connection-timeout: 6000
 
   messages:
     basename: i18n/messages
@@ -32,14 +33,10 @@ spring:
 #  mail
   mail:
     host: smtp.gmail.com
-    username: elliotsaii1@gmail.com
-    password: inrfbjqwjrdzuakv
+    username: viporgcenter@gmail.com
+    password: gzwtxbsncdlpzsge
     port: 465
     protocol: smtps
-    #    smtp:
-    #      proxy:
-    #        host: 192.168.10.199
-    #        port: 7890
     properties:
       mail:
         transport:

@@ -5,7 +5,7 @@ import com.techguy.entity.MemberBank;
 import java.util.List;
 
 public interface MemberBankService {
-    void save(MemberBank memberBank);
+    MemberBank save(MemberBank memberBank);
 
     MemberBank findByMemberId(Long memberId, Integer type,Long bankId);
 

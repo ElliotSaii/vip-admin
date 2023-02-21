@@ -21,7 +21,9 @@ public class ProductRecord implements Serializable {
     private Long id;
     private Long memberId;
     private Long productId;
+
     private Long subProductId;
+    private String productName;
 
     private String name;
     private BigDecimal buyAmount;

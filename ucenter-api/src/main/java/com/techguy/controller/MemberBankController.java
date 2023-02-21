@@ -47,15 +47,18 @@ public class MemberBankController {
         Member member = memberService.findByMemberId(memberId);
         if(member!=null){
             MemberBank memberBank = new MemberBank();
+            memberBank.setCreateTime(new Date());
             if(type==1){
                 memberBank.setType(1);
                 memberBank.setMemberId(memberId);
                 memberBank.setAlipayAccName(alipayAccName);
                 memberBank.setAlipayAccNo(alipayAccNo);
-                memberBank.setCreateTime(new Date());
-                memberBankService.save(memberBank);
-                result.success(messageSourceService.getMessage("BINDING_SUCCESS"));
-                result.setResult(memberBank);
+                MemberBank saveBank = memberBankService.save(memberBank);
+                if(saveBank!=null){
+                    saveBank.setBankAccNo(null);
+                    result.success(messageSourceService.getMessage("BINDING_SUCCESS"));
+                    result.setResult(saveBank);
+                }
                 return result;
             }else if(type==2){
                 memberBank.setType(2);
@@ -64,10 +67,12 @@ public class MemberBankController {
                 memberBank.setBankAccNo(bankAccNo);
                 memberBank.setBankName(bankName);
                 memberBank.setBankBranchName(bankBranchName);
-                memberBank.setCreateTime(new Date());
-                memberBankService.save(memberBank);
-                result.success(messageSourceService.getMessage("BINDING_SUCCESS"));
-                result.setResult(memberBank);
+                MemberBank saveBank = memberBankService.save(memberBank);
+                if(saveBank!=null){
+                    saveBank.setBankAccNo(null);
+                    result.success(messageSourceService.getMessage("BINDING_SUCCESS"));
+                    result.setResult(saveBank);
+                }
                 return result;
             }
         }

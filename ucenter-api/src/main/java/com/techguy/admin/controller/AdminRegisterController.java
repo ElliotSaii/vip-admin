@@ -72,7 +72,13 @@ public class AdminRegisterController {
             String verySecrectKey = passwordEncoder.encode(secrectkey);
             Admin admin1 = adminService.register(encodePW, email,verySecrectKey);
 
+
             if (admin1 != null) {
+
+                admin1.setPassword(null);
+                admin1.setEmail(null);
+                admin1.setSecrectKey(null);
+
                 redisTemplate.delete(checkCode);
                 result.setCode(CommonConstant.OK_200);
                 result.setMessage("Registered success!");

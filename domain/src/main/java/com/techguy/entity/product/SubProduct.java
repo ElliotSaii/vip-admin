@@ -27,6 +27,7 @@ public class SubProduct implements Serializable {
     private Long id;
     private Long memberId;
     private Long productId;
+    private String productName;
     private String name;
     private Integer buyStatus;
     private BigDecimal unitPrice;

@@ -37,4 +37,11 @@ public class WithdrawServiceImpl implements WithdrawService {
 
     return withdrawRepository.save(withdraw1);
     }
+
+    @Override
+    public Withdraw viewFee() {
+      return withdrawRepository.findById(101L).orElseThrow(()-> new IllegalArgumentException(
+                 String.format("Given id %s not found",101)
+         ));
+    }
 }

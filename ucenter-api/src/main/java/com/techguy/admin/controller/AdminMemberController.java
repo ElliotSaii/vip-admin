@@ -34,23 +34,32 @@ public class AdminMemberController {
     @GetMapping("/realName-request")
     public MessageResult<Member> realName(@RequestParam("pageNo")Integer pageNo,@RequestParam("pageSize")Integer pageSize){
         pageNo = (pageNo-1);
+
+        Integer status = 1;
+
         Pageable page = PageRequest.of(pageNo, pageSize, Sort.by("createTime").ascending());
         MessageResult<Member> result = new MessageResult<>();
         Map<String,Object> map = new HashMap<>();
-        Page<Member> memberPage = memberService.findAll(page);
+        Page<Member> memberPage = memberService.findRealNameRequest(status,page);
+
         long totalElements = memberPage.getTotalElements();
         List<Member>memberList = memberPage.getContent();
-        List<Member> members = new ArrayList<>();
+
+        List<Member>memberListDto =new ArrayList<>();
 
         if ((memberList.size() >0)){
 
-         for (Member member : memberList){
-             if (member.getRealNameStatus()==1) {
-                 members.add(member);
-             }
-         }
-         map.put("totalElements",totalElements);
-         map.put("list",members);
+            for(Member member: memberList){
+                member.setFundPassword(null);
+                member.setPassword(null);
+                member.setToken(null);
+                member.setPlainFundPassword(null);
+
+                memberListDto.add(member);
+            }
+
+          map.put("totalElements",totalElements);
+          map.put("list",memberListDto);
           result.success("Real Name request members");
           result.setResult(map);
           return result;
@@ -69,6 +78,7 @@ public class AdminMemberController {
 
         if(member!=null){
             if(status==3){
+
                 member.setName(null);
                 member.setUsername(null);
             }
@@ -111,9 +121,20 @@ public class AdminMemberController {
 
         List<Member> memberList = memberPage.getContent();
         long totalElements = memberPage.getTotalElements();
-        map.put("totalElements",totalElements);
+        List<Member> memberListDto =new ArrayList<>();
         if(memberList.size()>0){
-            map.put("list",memberList);
+
+            memberList.forEach(member -> {
+
+                member.setPassword(null);
+                member.setToken(null);
+                member.setFundPassword(null);
+
+                memberListDto.add(member);
+            });
+
+            map.put("totalElements",totalElements);
+            map.put("list",memberListDto);
             result.success("Member List");
             result.setResult(map);
             return result;

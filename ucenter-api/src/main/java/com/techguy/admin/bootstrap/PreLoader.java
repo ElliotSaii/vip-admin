@@ -23,7 +23,7 @@ public class PreLoader implements CommandLineRunner {
 
     private void loadContext() {
         if(adminRepository.count()==0){
-            adminRepository.save(new Admin(500L,null,"admin@gmail.com",null,passwordEncoder.encode("vvipadmin123456"),new Date(),Roles.ADMIN,passwordEncoder.encode("ima34rw3r3wrsdfsefesfd324324324*&^$%w#")
+            adminRepository.save(new Admin(500L,null,"viporgcenter@gmail.com",null,passwordEncoder.encode("theviporgcenter"),new Date(),Roles.ADMIN,passwordEncoder.encode("ima34rw3r3wrsdfsefesfd324324324*&^$%w#")
             ));
 
         }

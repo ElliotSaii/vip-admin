@@ -24,6 +24,9 @@ public class MemberController {
         MessageResult<?> result =new MessageResult<>();
         Member member = memberService.findByMemberId(memberId);
         if(member!=null){
+            member.setPassword(null);
+            member.setPlainFundPassword(null);
+            member.setRoles(null);
             result.success("User info");
             result.setResult(member);
         }

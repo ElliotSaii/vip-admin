@@ -12,6 +12,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -54,6 +56,7 @@ public class UserSettingController {
             Member appMember = memberService.update(member);
 
             if (appMember != null) {
+
                 result.setSuccess(true);
                 result.setMessage(messageSourceService.getMessage("PENDING_REQ"));
                 result.setResult(appMember.getRealNameStatus());
@@ -72,17 +75,20 @@ public class UserSettingController {
         MessageResult<?> result = new MessageResult<>();
 
         Member member = memberService.findByMemberId(memberId);
-        if (member != null) {
+        if (member != null && member.getFundPassword()==null) {
             if (password.length()>5){
                 String fundPW =passwordEncoder.encode(password);
                 member.setFundPassword(fundPW);
                 member.setPlainFundPassword(password);
-                memberService.update(member);
+                Member appMember = memberService.update(member);
+
+
+
 
                 result.setSuccess(true);
                 result.setCode(CommonConstant.OK_200);
                 result.setMessage(messageSourceService.getMessage("GENERATED_FUN_PSW"));
-                result.setResult(password);
+               //result.setResult(appMember);
                 return result;
             }else {
                 result.setSuccess(false);
@@ -91,6 +97,10 @@ public class UserSettingController {
                 result.setResult(null);
                 return  result;
             }
+        }
+        else {
+            result.error500(messageSourceService.getMessage("OPERATION_FAIL"));
+
         }
         return result;
 
@@ -112,7 +122,7 @@ public class UserSettingController {
     public MessageResult<Member> profile(@RequestParam("memberId")Long memberId,@RequestParam("headIcon")String headIcon){
        MessageResult<Member> result = new MessageResult<>();
         Member member = memberService.findByMemberId(memberId);
-        Member appMember = new Member();
+
          if(member!=null){
             member.setHeadIcon(headIcon);
 
@@ -221,9 +231,8 @@ public class UserSettingController {
                 member.setPlainFundPassword(newFundPassword);
                 Member mem = memberService.update(member);
                 if(mem !=null){
-                    appMember.setFundPassword(mem.getFundPassword());
                     result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
-                    result.setResult(appMember.getFundPassword());
+                    result.setResult(newFundPassword);
                     return result;
                 }
             }else {
@@ -254,7 +263,7 @@ public class UserSettingController {
                     if(mem!=null){
                         appMember.setPassword(newPassword);
                         result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
-                        result.setResult(appMember.getPassword());
+//                        result.setResult(appMember.getPassword());
                         return result;
                     }
                 }

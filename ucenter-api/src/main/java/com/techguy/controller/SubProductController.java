@@ -10,6 +10,7 @@ import com.techguy.entity.product.SubProduct;
 import com.techguy.entity.product.SubProductRecord;
 import com.techguy.response.MessageResult;
 import com.techguy.service.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +25,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/sub-product")
+@Slf4j
 public class SubProductController {
     private final ProductService productService;
     private final SubProductService subProductService;
@@ -190,6 +192,7 @@ public class SubProductController {
            record.setSubProductId(subProductId);
            record.setBuyStatus(1);
            record.setName(subProduct.getName());
+           record.setProductName(subProduct.getProductName());
            record.setMemberId(memberId);
            record.setImageUrl(imageUrl);
            record.setProductType(2);
@@ -200,6 +203,7 @@ public class SubProductController {
 
             ProductRecord saveProductRecord = productRecordService.save(record);
 
+            subProduct.setProductName(subProduct.getProductName());
             subRecord.setProductId(productId);
             subRecord.setSubProductId(subProductId);
             subRecord.setBuyStatus(1);
@@ -209,6 +213,8 @@ public class SubProductController {
             subRecord.setCreateTime(new Date());
             subRecord.setUnitPrice(subProduct.getUnitPrice());
             SubProductRecord saveSubProductRecord = subProductRecordService.save(subRecord);
+
+
 //           ProductRecord productRecord1 = new ProductRecord();
 
             if (saveProductRecord == null && saveSubProductRecord==null) {
@@ -216,13 +222,14 @@ public class SubProductController {
                 return result;
             }
 
-
+          log.info("New->Member id: {},sub product id: {},admin img: {}",memberId,subProductId,adminImageUrl);
 
             result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
             result.setResult(saveProductRecord);
             return result;
         }
         if(productRecord!=null && productRecord.getBuyStatus()==3) {
+            record.setProductName(subProduct.getProductName());
             record.setId(productRecord.getId());
             record.setProductId(productId);
             record.setSubProductId(subProductId);
@@ -238,6 +245,7 @@ public class SubProductController {
 
             ProductRecord saveProductRecord = productRecordService.update(record);
 
+            log.info("Retry->Member id: {},sub product id: {},admin img: {}",memberId,subProductId,adminImageUrl);
             result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
             result.setResult(saveProductRecord);
             return result;

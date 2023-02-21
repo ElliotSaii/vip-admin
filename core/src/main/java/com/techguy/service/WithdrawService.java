@@ -8,4 +8,6 @@ public interface WithdrawService {
     Withdraw findById(Long withdrawId);
 
     Withdraw update(Withdraw withdraw);
+
+    Withdraw viewFee();
 }
