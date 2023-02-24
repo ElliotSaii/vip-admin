@@ -48,6 +48,7 @@ spring:
 
   # redis
   redis:
+  cache:
     database: 0
     host: 127.0.0.1
     lettuce:
@@ -59,7 +60,8 @@ spring:
       shutdown-timeout: 100ms
     password: ''
     port: 6379
-#File
+    type: redis
+  #File
   servlet:
     multipart:
       max-request-size: 60MB

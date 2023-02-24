@@ -10,6 +10,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
 
@@ -22,17 +23,20 @@ public class EmailService {
 
     @Async
     public void sendMail(Email email) throws MessagingException {
+        String from ="M-Cash <viporgcenter@gmail.com>";
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message,MimeMessageHelper.MULTIPART_MODE_RELATED, StandardCharsets.UTF_8.name());
         Context context = new Context();
         context.setVariables(email.getProperties());
-        helper.setFrom(email.getFrom());
+
+        helper.setFrom(new InternetAddress(from));
+
         helper.setTo(email.getTo());
         helper.setSubject(email.getSubject());
         String html = springTemplateEngine.process(email.getTemplate(), context);
         helper.setText(html,true);
-
-        log.info("Send mail :{} with body: {}",email,html);
         emailSender.send(message);
+
+        log.info("Send mail to=> {} with code= {}",email.getTo(),email.getProperties().get("code"));
     }
 }

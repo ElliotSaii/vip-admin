@@ -11,8 +11,10 @@
 <p>
     Your verify code: <span th:text="${code}" style="color : blue;text-transform: uppercase"></span>
     <br/>
+    This code will expire in <span th:text="${time}" style="color: black; font-size: medium; font-weight: bold"></span> mins <br/>
+    If you did not make this request,<span style="color: darkred" >please disregard this email.</span>
+    <br/>
     <span th:text="${date}"></span>
-</p>
 <p>
     Regards, <br/>
     <em>M-Cash Organization</em>

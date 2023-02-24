@@ -13,14 +13,13 @@ import com.techguy.mail.EmailService;
 import com.techguy.response.MessageResult;
 import com.techguy.service.MemberService;
 //import com.techguy.utils.CommonUtils;
+import com.techguy.service.impl.MemberServiceImpl;
 import com.techguy.utils.CommonUtils;
 import com.techguy.utils.MD5Util;
 import com.techguy.utils.RandImageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
@@ -54,21 +53,23 @@ public class SysController {
 
 
 
+
     @Value(value="${vip.uploadType}")
     private String uploadType;
 
     @Value(value = "${vip.path.upload}")
     private String uploadpath;
-    @Value(value = "${spring.mail.username}")
-    private String from;
+//    @Value(value = "${spring.mail.username}")
+//    private String from;
 
-    public SysController(RedisTemplate<String, Object> redisTemplate, MemberService memberService, PasswordEncoder passwordEncoder, EmailService emailService, JWTUtility jwtUtility, LocaleMessageSourceService messageSourceService) {
+    public SysController(RedisTemplate<String, Object> redisTemplate, MemberService memberService, PasswordEncoder passwordEncoder, EmailService emailService, JWTUtility jwtUtility, LocaleMessageSourceService messageSourceService, MemberServiceImpl memberServiceImpl) {
         this.redisTemplate = redisTemplate;
         this.memberService = memberService;
         this.passwordEncoder =passwordEncoder;
         this.emailService = emailService;
         this.jwtUtility = jwtUtility;
         this.messageSourceService = messageSourceService;
+
     }
 
 
@@ -135,76 +136,73 @@ public class SysController {
 
         result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
         result.setResult(member);
-        redisTemplate.delete((String) checkCode);
+        redisTemplate.delete(SysConstant.EMAIL_BIND_CODE_PREFIX+email);
         return result;
     }
 
     @PostMapping("/sendMail")
-    public MessageResult<Email> sendMail (@RequestParam("email")String email) throws Exception {
+    public MessageResult<Email> sendMail (@RequestParam("email")String email,@RequestParam(value = "forget",defaultValue = "500")Integer forget) throws Exception {
         MessageResult<Email> result = new MessageResult<>();
-
         Member member = memberService.findByEmail(email);
-        //forget pass if memId not null
-        if (member == null || member.getId()!=null) {
-            try {
-            Object checkCode = redisTemplate.opsForValue().get(SysConstant.EMAIL_BIND_CODE_PREFIX + email);
+
+        //new register forget=0 ,forget=1 forgot pass , forget=2 change email
+        if ((member==null && forget==0) || (member!=null && forget==1) || (member==null && forget==2)) {
+            Object checkCode = getCheckCode(email);
             if(checkCode!=null){
                 result.error500(messageSourceService.getMessage("EMAIL_ALREADY_SEND"));
                 return result;
             }
-            String formatName = "";
-                formatName= formatName(email);
-
-            //store in  redis 3 mins
-            String code = OnlyCodeUtils.creatUUID();
-            String lowerCase = code.toLowerCase();
-            String realKey = MD5Util.MD5Encode(lowerCase, "utf-8");
-            redisTemplate.opsForValue().set(SysConstant.EMAIL_BIND_CODE_PREFIX+email, lowerCase, 3, TimeUnit.MINUTES);
-
-            Email mail = new Email();
-            mail.setTo(email);
-            mail.setFrom(from);
-            mail.setSubject("M-Cash Email");
-            mail.setTemplate("mail.html");
-            Map<String, Object> properties = new HashMap<>();
-            properties.put("name", "Dear " + formatName);
-            properties.put("date", LocalDate.now().toString());
-            properties.put("code", code);
-//            properties.put("technologies", Arrays.asList("Python", "Go", "C#"));
-            mail.setProperties(properties);
-
-                   
-
-
-            emailService.sendMail(mail);
-
-            result.setMessage(messageSourceService.getMessage("OPERATION_SUCCESS"));
-            result.setCode(CommonConstant.OK_200);
-            result.setSuccess(true);
-            result.setResult(mail);
-
-            return result;
-
+            String code = this.sendEmail(email);
+            if(code!=null){
+                result.success(messageSourceService.getMessage("OPERATION_SUCCESS"));
+                return result;
             }
-
-            catch (MessagingException e) {
-                throw new Exception(e.getMessage());
-            }
-
-            catch (Exception e) {
-                e.getMessage();
-                throw new Exception(e.getMessage());
-            }
-
         }
-
-        else if(member.getEmail().equals(email)){
+        //Email Exit
+       else if(member.getEmail().equals(email) || forget==500){
             result.error500(messageSourceService.getMessage("MAIL_ALREADY_EXIT"));
             return result;
         }
       return  result;
-
     }
+
+    private Object getCheckCode(String email) {
+        return redisTemplate.opsForValue().get(SysConstant.EMAIL_BIND_CODE_PREFIX + email);
+    }
+
+    private String sendEmail(String email) throws Exception {
+         try {
+
+             String formatName = "";
+             formatName= formatName(email);
+             //store in  redis 3 mins
+             String code = OnlyCodeUtils.creatUUID();
+             String lowerCase = code.toLowerCase();
+
+             Email mail = new Email();
+
+             mail.setTo(email);
+             mail.setSubject("M-Cash Email");
+             mail.setTemplate("mail.html");
+             Map<String, Object> properties = new HashMap<>();
+             properties.put("name", "Dear " + formatName);
+             properties.put("date", LocalDate.now().toString());
+             properties.put("code", code);
+             properties.put("time", 3);
+             mail.setProperties(properties);
+             emailService.sendMail(mail);
+
+             redisTemplate.opsForValue().set(SysConstant.EMAIL_BIND_CODE_PREFIX+email, lowerCase, 3, TimeUnit.MINUTES);
+             return code;
+         }
+         catch (MessagingException e) {
+             throw new Exception(e.getMessage());
+         }
+         catch (Exception e) {
+             e.printStackTrace();
+             throw new Exception(e.getMessage());
+         }
+     }
 
     private String formatName(String email) {
         email =email.substring(0,email.indexOf("@"));

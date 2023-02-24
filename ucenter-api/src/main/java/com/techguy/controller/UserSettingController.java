@@ -3,6 +3,7 @@ package com.techguy.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.techguy.config.LocaleMessageSourceService;
 import com.techguy.constant.CommonConstant;
+import com.techguy.constant.SysConstant;
 import com.techguy.entity.Member;
 import com.techguy.response.MessageResult;
 import com.techguy.service.MemberService;
@@ -143,30 +144,28 @@ public class UserSettingController {
        Member appMember = new Member();
         Member member = memberService.findByMemberId(memberId);
         code = code.toLowerCase();
-        String realKey = MD5Util.MD5Encode(code, "utf-8");
 
-        Object checkCode = redisTemplate.opsForValue().get(realKey);
+
+        Object checkCode = redisTemplate.opsForValue().get(SysConstant.EMAIL_BIND_CODE_PREFIX + oldEmail);
 
         if (member != null) {
             if (member.getEmail().equals(oldEmail)){
+
                 if(ObjectUtil.isEmpty(code) || ObjectUtil.isNull(code) || !code.equals(checkCode)){
-                    result.setSuccess(false);
-                    result.setCode(CommonConstant.INTERNAL_SERVER_ERROR_500);
-                    result.setMessage(messageSourceService.getMessage(CommonConstant.VERIFY_CODE_WRONG));
-                    result.setResult(null);
+                    result.error500(messageSourceService.getMessage("VERIFY_CODE_WRONG"));
                     return result;
                 }
 
                 member.setEmail(newEmail);
                 Member mem = memberService.update(member);
                 appMember.setEmail(mem.getEmail());
-                result.setMessage(messageSourceService.getMessage("CHANGE_SUCCESS"));
-                result.setResult(appMember.getEmail());
-                redisTemplate.delete(realKey);
+                result.success(messageSourceService.getMessage("CHANGE_SUCCESS"));
+
+                redisTemplate.delete(SysConstant.EMAIL_BIND_CODE_PREFIX+oldEmail);
+
                 return result;
             }
-            result.error500(messageSourceService.getMessage("MAIL_NOT_REGISTER"));
-            return result;
+            return result.error500(messageSourceService.getMessage("OPERATION_FAIL"));
         }
         return result;
     }

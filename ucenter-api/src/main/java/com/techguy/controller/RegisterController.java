@@ -67,11 +67,10 @@ public class RegisterController {
                     String encodePW = passwordEncoder.encode(password);
                     Member mem = memberService.register(newMember, encodePW, email, upId);
                     if (mem != null) {
-                        redisTemplate.delete(checkCode);
-
                         result.success(messageSourceService.getMessage("REGISTER_SUCCESS"));
                         result.setResult(mem);
                         log.info("Member Register {}", mem.getEmail());
+                        redisTemplate.delete(SysConstant.EMAIL_BIND_CODE_PREFIX+email);
                         return result;
                     } else {
                         result.error500("OPERATION_FAIL");
@@ -90,11 +89,10 @@ public class RegisterController {
                     mem.setFundPassword(null);
                     mem.setPlainFundPassword(null);
                     mem.setRoles(null);
-
-                    redisTemplate.delete(checkCode);
                     result.success(messageSourceService.getMessage("REGISTER_SUCCESS"));
                     result.setResult(mem);
                     log.info("New member registered id:{}", mem.getId());
+                    redisTemplate.delete(SysConstant.EMAIL_BIND_CODE_PREFIX+email);
                     return result;
                 }
             }
